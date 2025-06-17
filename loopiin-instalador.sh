@@ -648,7 +648,8 @@ EOL
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
     
-    (sudo docker compose up -d) > /dev/null 2>&1 & spinner $!
+    #(sudo docker compose up -d) > /dev/null 2>&1 & spinner $!
+    (sudo docker stack deploy -c docker-compose.yml proxy) > /dev/null 2>&1 & spinner $!
     wait $!
     
     if [ $? -ne 0 ]; then
