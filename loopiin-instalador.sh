@@ -633,7 +633,7 @@ EOL
 
     if ! sudo docker network ls | grep -q "web"; then
     echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
-    (sudo docker swarm init && sudo docker network create --driver=overlay --attachable=false web) > /dev/null 2>&1 & spinner $!
+    (sudo docker swarm init && sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
     wait $!
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao criar a rede Docker 'web'.${NC}"
@@ -648,8 +648,8 @@ EOL
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
     
-    #(sudo docker compose up -d) > /dev/null 2>&1 & spinner $!
-    (sudo docker stack deploy -c docker-compose.yml proxy) > /dev/null 2>&1 & spinner $!
+    (sudo docker compose up -d) > /dev/null 2>&1 & spinner $!
+    #(sudo docker stack deploy -c docker-compose.yml proxy) > /dev/null 2>&1 & spinner $!
     wait $!
     
     if [ $? -ne 0 ]; then
