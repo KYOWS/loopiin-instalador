@@ -643,13 +643,25 @@ EOL
     else
     echo -e "${GREEN}✅ Rede Docker 'web' já existe.${NC}"
     fi
+
+    if ! sudo docker network ls | grep -q "n8n_internal"; then
+    echo -e "${YELLOW}🌐 Criando rede Docker 'n8n_internal'...${NC}"
+    (sudo docker network create --driver=overlay --attachable=true n8n_internal) > /dev/null 2>&1 & spinner $!
+    wait $!
+    if [ $? -ne 0 ]; then
+        echo -e "${RED}❌ Erro ao criar a rede Docker 'n8n_internal'.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✅ Rede Docker 'n8n_internal' criada com sucesso.${NC}"
+    else
+    echo -e "${GREEN}✅ Rede Docker 'n8n_internal' já existe.${NC}"
+    fi
     
     cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
     
     (sudo docker compose up -d) > /dev/null 2>&1 & spinner $!
-    #(sudo docker stack deploy -c docker-compose.yml proxy) > /dev/null 2>&1 & spinner $!
     wait $!
     
     if [ $? -ne 0 ]; then
