@@ -530,6 +530,10 @@ services:
         max-file: "3"   
 
 networks:
+ agent_network:
+    driver: overlay
+    attachable: true
+    external: true
   web:
     external: true
 EOL
