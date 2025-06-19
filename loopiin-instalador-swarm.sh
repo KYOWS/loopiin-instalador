@@ -477,13 +477,25 @@ services:
       options:
         max-size: "10m"
         max-file: "3"    
-
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    command: -H unix:///var/run/docker.sock
+ agent:
+    image: portainer/agent:lts
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /docker/portainer/data:/data
+    #labels:
+    #  - "traefik.enable=false" 
+    networks:
+      - agent_network
+    deploy:
+      mode: global
+      placement:
+        constraints: [node.platform.os == linux]
+
+  portainer:
+    image: portainer/portainer-ce:lts
+    container_name: portainer
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+    volumes:
       - /docker/portainer/data:/data
     networks:
       - web
