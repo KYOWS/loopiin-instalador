@@ -479,6 +479,7 @@ services:
         max-file: "3"    
  agent:
     image: portainer/agent:lts
+    container_name: portainer-agent
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /docker/portainer/data:/data
