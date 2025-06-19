@@ -483,8 +483,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /docker/portainer/data:/data
-    #labels:
-    #  - "traefik.enable=false" 
+    labels:
+      - "traefik.enable=false" 
     networks:
       - agent_network
     deploy:
