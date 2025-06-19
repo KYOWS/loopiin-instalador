@@ -444,19 +444,38 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
 services:  
   traefik:
     image: traefik:latest
-    container_name: traefik
-    restart: unless-stopped 
+    container_name: traefik 
     networks:
       - web
     ports:
-      - 80:80
-      - 443:443
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
     volumes:
       - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /docker/traefik/traefik.toml:/traefik.toml
       - /docker/traefik/traefik_dynamic.toml:/traefik_dynamic.toml
       - /docker/traefik/acme.json:/acme.json
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          # Garante que o serviço rode apenas em nós 'manager' para ter acesso
+          # consistente aos arquivos de configuração e volumes.
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+    labels:
+        # Estas labels são para o próprio Traefik, não para expor o serviço
+        - "traefik.enable=true"
+        - "traefik.docker.network=web"
     logging:
       options:
         max-size: "10m"
@@ -465,7 +484,6 @@ services:
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
-    restart: unless-stopped
     command: -H unix:///var/run/docker.sock
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -476,6 +494,16 @@ services:
       - 9443:9443
     networks:
       - web
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          # Garante que o Portainer rode em um nó 'manager', mantendo o acesso
+          # ao seu volume de dados.
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
     labels:
       - "traefik.enable=true"
     # Roteador e Serviço para a interface principal do Portainer (porta 9000)
@@ -552,6 +580,7 @@ EOL
   [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
 
 [providers.docker]
+  swarmMode = true
   watch = true
   network = "web"
   exposedByDefault = false
@@ -633,7 +662,7 @@ EOL
 
     if ! sudo docker network ls | grep -q "web"; then
     echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
-    (sudo docker swarm init && sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
+    (sudo docker swarm init --advertise-addr [ip] && sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
     wait $!
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao criar a rede Docker 'web'.${NC}"
