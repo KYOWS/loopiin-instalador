@@ -439,7 +439,7 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
     # Entra no diretório /docker para criar os arquivos
     cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
     
-   echo -e "${YELLOW}📝 Criando docker-compose.yml...${NC}"
+   echo -e "${YELLOW}📝 Criando docker-swarm.yml...${NC}"
     cat <<EOL | sudo tee docker-swarm.yml > /dev/null
 services:  
   traefik:
@@ -521,7 +521,7 @@ networks:
   web:
     external: true
 EOL
-    echo -e "${GREEN}✅ docker-compose.yml criado com sucesso.${NC}"
+    echo -e "${GREEN}✅ docker-swarm.yml criado com sucesso.${NC}"
 
  ################################
  ##### CRIANDO TRAEFIK.TOML #####
