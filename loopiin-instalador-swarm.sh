@@ -491,6 +491,10 @@ services:
       mode: global
       placement:
         constraints: [node.platform.os == linux]
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"    
 
   portainer:
     image: portainer/portainer-ce:lts
