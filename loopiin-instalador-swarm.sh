@@ -467,13 +467,10 @@ services:
       replicas: 1
       placement:
         constraints:
-          # Garante que o serviço rode apenas em nós 'manager' para ter acesso
-          # consistente aos arquivos de configuração e volumes.
           - node.role == manager
       restart_policy:
         condition: on-failure
     labels:
-        # Estas labels são para o próprio Traefik, não para expor o serviço
         - "traefik.enable=true"
         - "traefik.docker.network=web"
     logging:
@@ -488,10 +485,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /docker/portainer/data:/data
-    ports:
-      - 8000:8000
-      - 9000:9000
-      - 9443:9443
     networks:
       - web
     deploy:
@@ -499,8 +492,6 @@ services:
       replicas: 1
       placement:
         constraints:
-          # Garante que o Portainer rode em um nó 'manager', mantendo o acesso
-          # ao seu volume de dados.
           - node.role == manager
       restart_policy:
         condition: on-failure
