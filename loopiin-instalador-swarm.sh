@@ -491,7 +491,10 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
     fi
     check_apache2_utils || { echo -e "${RED}❌ Não foi possível instalar o apache2-utils. Saindo.${NC}"; exit 1; }
     check_openssl || { echo -e "${RED}❌ Não foi possível instalar o openssl. Saindo.${NC}"; exit 1; }
-    
+   
+    # Configuração do Firewall
+    configure_firewall || { echo -e "${RED}❌ Não foi possível configurar o firewall. Saindo.${NC}"; exit 1; }
+
     encrypted_password=$(htpasswd -nb -B -C 10 "$traefik_user" "$traefik_senha")
     
     echo -e "${GREEN}✅ Sistema atualizado e dependências básicas instaladas.${NC}"
