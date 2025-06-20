@@ -760,6 +760,14 @@ EOL
   burst = 100
   average = 50
 
+# Middleware específico para Portainer
+[http.middlewares.portainerHeaders.headers]
+  customRequestHeaders = [
+    "X-Forwarded-Proto: https",
+    "X-Forwarded-Port: 443",
+    "X-Forwarded-Host: $portainer_domain"
+  ]
+
 [http.routers.api]
   rule = "Host(\`$traefik_domain\`) || Host(\`www.$traefik_domain\`)"
   entrypoints = ["websecure"]
