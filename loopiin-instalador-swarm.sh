@@ -672,9 +672,16 @@ EOL
 
     cd || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
 
+    # Pega o primeiro IP da máquina
+    SERVER_IP=$(hostname -I | awk '{print $1}')
+    if [ -z "$SERVER_IP" ]; then
+        echo -e "${RED}❌ Não foi possível detectar o endereço IP do servidor.${NC}"
+        exit 1
+    fi
+
     if ! sudo docker network ls | grep -q "web"; then
     echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
-    (sudo docker swarm init --advertise-addr [ip] && sudo docker network create --driver=overlay --attachable=false web) > /dev/null 2>&1 & spinner $!
+    (sudo docker swarm init --advertise-addr "$SERVER_IP" && sudo docker network create --driver=overlay --attachable=true web && sudo docker network create --driver=overlay --attachable=true agent_network) > /dev/null 2>&1 & spinner $!
     wait $!
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao criar a rede Docker 'web'.${NC}"
