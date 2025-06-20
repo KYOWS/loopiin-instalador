@@ -531,7 +531,6 @@ services:
       - "traefik.http.services.portainer-edge.loadbalancer.server.port=8000" # Define um serviço Traefik chamado 'portainer-edge'
       - "traefik.http.routers.edge.service=portainer-edge"
       - "traefik.http.routers.edge.middlewares=redirect-www-to-main@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
-      
     logging:
       options:
         max-size: "10m"
