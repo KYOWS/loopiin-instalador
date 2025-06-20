@@ -83,6 +83,40 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
     return 0
 }
 
+###############################################################
+##### Função para gerar certificados TLS para o Portainer #####
+###############################################################
+generate_portainer_certs() {
+    echo -e "${BLUE}Gerando certificados TLS para comunicação segura Portainer <-> Agent...${NC}"
+    local CERT_DIR="/docker/portainer/certs"
+    sudo mkdir -p "$CERT_DIR"
+
+    (
+    # Gerar a chave e o certificado da Autoridade Certificadora (CA)
+    sudo openssl genrsa -out "${CERT_DIR}/ca.key" 4096
+    sudo openssl req -x509 -new -nodes -key "${CERT_DIR}/ca.key" -sha256 -days 3650 -subj "/C=BR/ST=SP/L=SaoPaulo/O=Portainer/CN=portainer.ca" -out "${CERT_DIR}/ca.pem"
+
+    # Gerar a chave e a solicitação de assinatura (CSR) para o Agent
+    sudo openssl genrsa -out "${CERT_DIR}/agent.key" 4096
+    sudo openssl req -new -key "${CERT_DIR}/agent.key" -subj "/C=BR/ST=SP/L=SaoPaulo/O=Portainer/CN=tasks.agent" -out "${CERT_DIR}/agent.csr"
+
+    # Assinar o certificado do Agent com a nossa CA
+    sudo openssl x509 -req -in "${CERT_DIR}/agent.csr" -CA "${CERT_DIR}/ca.pem" -CAkey "${CERT_DIR}/ca.key" -CAcreateserial -out "${CERT_DIR}/agent.pem" -days 3650 -sha256
+
+    # Remover o CSR que não é mais necessário
+    sudo rm "${CERT_DIR}/agent.csr"
+    ) > /dev/null 2>&1 & spinner $!
+    wait $!
+
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✅ Certificados TLS gerados com sucesso em ${CERT_DIR}${NC}"
+        return 0
+    else
+        echo -e "${RED}❌ Erro ao gerar os certificados TLS.${NC}"
+        return 1
+    fi
+}
+
 #######################################################
 ##### Função para mostrar spinner de carregamento #####
 #######################################################
