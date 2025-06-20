@@ -750,19 +750,6 @@ EOL
     echo -e "${GREEN}✅ Rede Docker 'web' já existe.${NC}"
     fi
 
-    if ! sudo docker network ls | grep -q "agent_network"; then
-    echo -e "${YELLOW}🌐 Criando rede Docker 'agent_network'...${NC}"
-    (sudo docker network create --driver=overlay --attachable=true agent_network) > /dev/null 2>&1 & spinner $!
-    wait $!
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Erro ao criar a rede Docker 'agent_network'.${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}✅ Rede Docker 'agent_network' criada com sucesso.${NC}"
-    else
-    echo -e "${GREEN}✅ Rede Docker 'agent_network' já existe.${NC}"
-    fi
-    
     cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
