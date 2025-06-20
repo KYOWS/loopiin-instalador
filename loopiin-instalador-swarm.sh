@@ -711,7 +711,7 @@ EOL
   [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
 
 [providers.docker]
-  swarmMode = true
+  #swarmMode = true
   watch = true
   network = "web"
   exposedByDefault = false
