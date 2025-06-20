@@ -538,7 +538,6 @@ networks:
  agent_network:
     driver: overlay
     attachable: true
-    external: true
   web:
     external: true
 EOL
