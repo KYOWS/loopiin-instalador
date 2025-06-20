@@ -451,11 +451,13 @@ services:
       - target: 80
         published: 80
         protocol: tcp
-        mode: host
+        mode: ingress
+        #mode: host
       - target: 443
         published: 443
         protocol: tcp
-        mode: host
+        mode: ingress
+        #mode: host
     volumes:
       - /etc/localtime:/etc/localtime
       - /var/run/docker.sock:/var/run/docker.sock:ro
