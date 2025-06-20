@@ -637,11 +637,27 @@ EOL
   forceSTSHeader = true
   stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
-  stsIncludeSubdomains = true  
+  stsIncludeSubdomains = true 
+  # Headers adicionais de segurança
+  customRequestHeaders = [
+    "X-Forwarded-Proto: https",
+    "X-Forwarded-Port: 443"
+  ]
+  # Política de permissões
+  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
 
 [http.middlewares.rateLimitMiddleware.rateLimit]
   burst = 100
   average = 50
+  period = "1m"
+
+# Middleware específico para Portainer
+[http.middlewares.portainerHeaders.headers]
+  customRequestHeaders = [
+    "X-Forwarded-Proto: https",
+    "X-Forwarded-Port: 443",
+    "X-Forwarded-Host: portainer.loopiin.com"
+  ]
 
 [http.routers.api]
   rule = "Host(\`$traefik_domain\`) || Host(\`www.$traefik_domain\`)"
@@ -650,6 +666,19 @@ EOL
   service = "api@internal"
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
+
+# Configuração adicional para SSL
+[tls.options]
+  [tls.options.default]
+    sslStrategies = ["tls.SniStrict"]
+    minVersion = "VersionTLS12"
+    cipherSuites = [
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_RSA_WITH_AES_256_GCM_SHA384",
+      "TLS_RSA_WITH_AES_128_GCM_SHA256"
+    ]
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
