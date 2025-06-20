@@ -828,7 +828,7 @@ EOL
     cd || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
 
     # Pega o primeiro IP da máquina
-    SERVER_IP=$(hostname -I | awk '{print $1}')
+    SERVER_IP=$(curl -s ifconfig.me)
     if [ -z "$SERVER_IP" ]; then
         echo -e "${RED}❌ Não foi possível detectar o endereço IP do servidor.${NC}"
         exit 1
