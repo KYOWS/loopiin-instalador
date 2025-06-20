@@ -503,6 +503,7 @@ services:
     volumes:
       - /docker/portainer/data:/data
     networks:
+      - agent_network
       - web
     deploy:
       mode: replicated
@@ -630,7 +631,7 @@ EOL
   frameDeny = true
   sslRedirect = true
   referrerPolicy = "strict-origin-when-cross-origin"  
-  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
   # strictTransportSecurity = true
   forceSTSHeader = true
