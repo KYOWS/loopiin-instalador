@@ -524,6 +524,9 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
         exit 1
     fi
     echo -e "${GREEN}✅ Diretórios criados com sucesso.${NC}"    
+
+    Gerar os certificados antes de criar o docker-swarm.yml
+    generate_portainer_certs || { echo -e "${RED}❌ Falha na geração de certificados. Saindo.${NC}"; exit 1; }
    
     ######################################
     ##### CRIANDO DOCKER-SWARM.YML #####
