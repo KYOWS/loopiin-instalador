@@ -679,9 +679,23 @@ EOL
         exit 1
     fi
 
+     # Antes de 'sudo docker swarm init...'
+    if ! sudo docker info --format '{{.Swarm.LocalNodeState}}' | grep -q "active"; then
+        echo -e "${YELLOW}🐳 Inicializando Docker Swarm...${NC}"
+        (sudo docker swarm init --advertise-addr "$SERVER_IP") > /dev/null 2>&1 & spinner $!
+        wait $!
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ Erro ao inicializar o Docker Swarm.${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✅ Docker Swarm inicializado.${NC}"
+    else
+        echo -e "${GREEN}✅ Docker Swarm já está ativo.${NC}"
+    fi
+
     if ! sudo docker network ls | grep -q "web"; then
     echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
-    (sudo docker swarm init --advertise-addr "$SERVER_IP" && sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
+    (sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
     wait $!
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao criar a rede Docker 'web'.${NC}"
