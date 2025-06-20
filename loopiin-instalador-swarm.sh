@@ -477,7 +477,7 @@ services:
       options:
         max-size: "10m"
         max-file: "3"    
- agent:
+  agent:
     image: portainer/agent:lts
     container_name: portainer-agent
     volumes:
@@ -535,7 +535,7 @@ services:
         max-file: "3"   
 
 networks:
- agent_network:
+  agent_network:
     driver: overlay
     attachable: true
   web:
