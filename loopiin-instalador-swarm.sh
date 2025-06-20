@@ -771,7 +771,7 @@ EOL
     wait $!
     
     if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Erro ao iniciar os containers Docker. Verifique a saída de 'sudo docker compose up'.${NC}"
+        echo -e "${RED}❌ Erro ao iniciar os containers Docker. Verifique a saída de 'sudo docker stack deploy'.${NC}"
         exit 1
     fi
     echo -e "${GREEN}✅ Containers iniciados com sucesso.${NC}"
