@@ -472,7 +472,7 @@ services:
         condition: on-failure
         delay: 10s           # Aguarda 10s antes de tentar
         max_attempts: 3      # Máximo 3 tentativas
-        window: 300s         # Em uma janela de 5 minutos
+        window: 180s         # Em uma janela de 3 minutos
     labels:
         - "traefik.enable=true"
         - "traefik.docker.network=web"
@@ -518,7 +518,7 @@ services:
         condition: on-failure
         delay: 15s           # Aguarda 15s antes de tentar
         max_attempts: 3      # Máximo 3 tentativas
-        window: 300s         # Em uma janela de 5 minutos
+        window: 180s         # Em uma janela de 3 minutos
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
