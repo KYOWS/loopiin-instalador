@@ -857,10 +857,30 @@ EOL
     cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
+
+    echo -e "${YELLOW}🧹 Verificando e limpando instalações anteriores...${NC}"
+
+    # Passo 1: Verifica se a stack 'loopiin' existe antes de tentar removê-la.
+    # O comando `docker stack ls` com `grep` só terá saída se a stack existir.
+    if [ ! -z "$(sudo docker stack ls --format '{{.Name}}' | grep '^loopiin$')" ]; then
+        echo -e "${YELLOW}-> Removendo stack 'loopiin' existente...${NC}"
+        (sudo docker stack rm loopiin) > /dev/null 2>&1 & spinner $!
+        wait $!        
+        echo -e "\n${GREEN}✅ Stack anterior removida com sucesso.${NC}"
+    else
+        echo -e "${GREEN}✅ Nenhuma stack 'loopiin' anterior encontrada.${NC}"
+    fi
+
+    # Passo 3: Remove as imagens do Traefik em cache, se existirem.
+    if [ ! -z "$(sudo docker images -q traefik)" ]; then
+        echo -e "${YELLOW}-> Removendo imagens do Traefik em cache...${NC}"
+        (sudo docker rmi $(sudo docker images -q traefik)) > /dev/null 2>&1 & spinner $!
+        wait $!
+        echo -e "${GREEN}✅ Imagens antigas do Traefik removidas.${NC}"
+    fi
     
-    (sudo docker stack rm loopiin && sudo docker rmi $(sudo docker images -q traefik) && sudo docker stack deploy -c docker-swarm.yml loopiin) > /dev/null 2>&1 & spinner $!
-    wait $!
-    
+    (sudo docker stack deploy -c docker-swarm.yml loopiin) > /dev/null 2>&1 & spinner $!
+    wait $!    
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao iniciar os containers Docker. Verifique a saída de 'sudo docker stack deploy'.${NC}"
         exit 1
