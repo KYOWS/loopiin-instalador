@@ -589,19 +589,13 @@ services:
         max-file: "3"    
   agent:
     image: portainer/agent:lts
-    container_name: portainer-agent
-    command:
-      - --tlscacert=/certs/ca.pem
-      - --tlscert=/certs/agent.pem
-      - --tlskey=/certs/agent.key
-      - --tlscert=/certs/client.pem
-      - --tlskey=/certs/client.key 
+    container_name: portainer-agent    
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /docker/portainer/data:/data
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
-      - /docker/portainer/certs/agent.pem:/certs/agent.pem:ro
-      - /docker/portainer/certs/agent.key:/certs/agent.key:ro
+      - /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
+      - /docker/portainer/certs/agent.key:/certs/key.pem:ro
     labels:
       - "traefik.enable=false" 
     networks:
