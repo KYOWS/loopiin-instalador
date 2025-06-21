@@ -636,7 +636,7 @@ services:
       - "traefik.http.routers.portainer.tls.certresolver=lets-encrypt"
       - "traefik.http.services.portainer-main.loadbalancer.server.port=9000" # Define um serviço Traefik chamado 'portainer-main'
       - "traefik.http.routers.portainer.service=portainer-main" # O roteador 'portainer' usa o serviço 'portainer-main'
-      - "traefik.http.routers.portainer.middlewares=redirect-www-to-main@file,securityPortainerHeaders@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
+      - "traefik.http.routers.portainer.middlewares=redirect-www-to-main@file,securityHeaders@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
     # Roteador e Serviço para o endpoint Edge do Portainer (porta 8000)
       - "traefik.http.routers.edge.rule=Host(\`$edge_domain\`) || Host(\`www.$edge_domain\`)"
       - "traefik.http.routers.edge.entrypoints=websecure"
@@ -748,22 +748,6 @@ EOL
   contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
   #strictTransportSecurity = true
-  forceSTSHeader = true
-  #stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
-  stsSeconds = 31536000 # 1 ano
-  stsIncludeSubdomains = true  
-  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
-
-# NOVO: Definição do middleware de segurança de cabeçalhos HTTP
-[http.middlewares.securityPortainerHeaders.headers]
-  browserXssFilter = true
-  contentTypeNosniff = true
-  frameDeny = true
-  sslRedirect = true
-  referrerPolicy = "strict-origin-when-cross-origin"  
-  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
-  # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
-  strictTransportSecurity = true
   forceSTSHeader = true
   #stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
