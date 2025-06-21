@@ -645,7 +645,7 @@ services:
       - "traefik.http.routers.portainer.tls.certresolver=lets-encrypt"
       - "traefik.http.services.portainer-main.loadbalancer.server.port=9000" # Define um serviço Traefik chamado 'portainer-main'
       - "traefik.http.routers.portainer.service=portainer-main" # O roteador 'portainer' usa o serviço 'portainer-main'
-      - "traefik.http.routers.portainer.middlewares=redirect-www-to-main@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
+      - "traefik.http.routers.portainer.middlewares=redirect-www-to-main@file,securityHeaders@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
     # Roteador e Serviço para o endpoint Edge do Portainer (porta 8000)
       - "traefik.http.routers.edge.rule=Host(\`$edge_domain\`) || Host(\`www.$edge_domain\`)"
       - "traefik.http.routers.edge.entrypoints=websecure"
@@ -653,7 +653,7 @@ services:
       - "traefik.http.routers.edge.tls.certresolver=lets-encrypt"
       - "traefik.http.services.portainer-edge.loadbalancer.server.port=8000" # Define um serviço Traefik chamado 'portainer-edge'
       - "traefik.http.routers.edge.service=portainer-edge"
-      - "traefik.http.routers.edge.middlewares=redirect-www-to-main@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
+      - "traefik.http.routers.edge.middlewares=redirect-www-to-main@file,securityHeaders@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
     logging:
       options:
         max-size: "10m"
