@@ -104,8 +104,16 @@ generate_portainer_certs() {
     # Assinar o certificado do Agent com a nossa CA
     sudo openssl x509 -req -in "${CERT_DIR}/agent.csr" -CA "${CERT_DIR}/ca.pem" -CAkey "${CERT_DIR}/ca.key" -CAcreateserial -out "${CERT_DIR}/agent.pem" -days 3650 -sha256
 
-    # Remover o CSR que não é mais necessário
+    # Gerar a chave e a solicitação de assinatura (CSR) para o Cliente (Portainer)
+    sudo openssl genrsa -out "${CERT_DIR}/client.key" 4096
+    sudo openssl req -new -key "${CERT_DIR}/client.key" -subj "/C=BR/ST=SP/L=SaoPaulo/O=Portainer/CN=portainer.client" -out "${CERT_DIR}/client.csr"
+
+    # Assinar o certificado do Cliente com a nossa CA
+    sudo openssl x509 -req -in "${CERT_DIR}/client.csr" -CA "${CERT_DIR}/ca.pem" -CAkey "${CERT_DIR}/ca.key" -CAcreateserial -out "${CERT_DIR}/client.pem" -days 3650 -sha256
+
+    # Remover os CSRs que não são mais necessários
     sudo rm "${CERT_DIR}/agent.csr"
+    sudo rm "${CERT_DIR}/client.csr"
     ) > /dev/null 2>&1 & spinner $!
     wait $!
 
@@ -586,6 +594,8 @@ services:
       - --tlscacert=/certs/ca.pem
       - --tlscert=/certs/agent.pem
       - --tlskey=/certs/agent.key
+      - --tlscert=/certs/client.pem
+      - --tlskey=/certs/client.key 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /docker/portainer/data:/data
