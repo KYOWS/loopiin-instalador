@@ -748,9 +748,9 @@ EOL
   frameDeny = true
   sslRedirect = true
   referrerPolicy = "strict-origin-when-cross-origin"  
-  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
+  #contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
-  strictTransportSecurity = true
+  #strictTransportSecurity = true
   forceSTSHeader = true
   stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
@@ -773,25 +773,22 @@ EOL
 [tls.options]
   [tls.options.default]
     minVersion = "VersionTLS12"
-    maxVersion = "VersionTLS13"
+    maxVersion = "VersionTLS13"    
     cipherSuites = [
-      # Cifras modernas para TLS 1.3
+      # TLS 1.3
       "TLS_AES_128_GCM_SHA256",
       "TLS_AES_256_GCM_SHA384",
-      "TLS_CHACHA20_POLY1305_SHA256",
       
-      # Cifras modernas para TLS 1.2
-      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",      
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+      # TLS 1.2
       "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",      
-      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"      
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
     ]
+    # Curvas mais compatíveis
     curvePreferences = [
-      "X25519",
-      "secp521r1",
-      "secp384r1"
+      "secp384r1",
+      "secp256r1"
     ]
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
