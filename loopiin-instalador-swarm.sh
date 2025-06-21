@@ -594,9 +594,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
       #- /docker/portainer/data:/data
-      #- /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
-      #- /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
-      #- /docker/portainer/certs/agent.key:/certs/key.pem:ro
+      - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
+      - /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
+      - /docker/portainer/certs/agent.key:/certs/key.pem:ro
     labels:
       - "traefik.enable=false" 
     networks:
@@ -614,15 +614,15 @@ services:
     image: portainer/portainer-ce:lts
     #container_name: portainer
     command:
-      -H tcp://tasks.agent:9001 --tlsskipverify
-      #- -H
-      #- tcp://tasks.agent:9001
-      #- --tlsverify
-      #- --tlscacert=/certs/ca.pem
+      #-H tcp://tasks.agent:9001 --tlsskipverify
+      - -H
+      - tcp://tasks.agent:9001
+      - --tlsverify
+      - --tlscacert=/certs/ca.pem
     volumes:
       - portainer_data:/data
       #- /docker/portainer/data:/data
-      #- /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
+      - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
     networks:
       - agent_network
       - web
@@ -631,11 +631,11 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
-      #restart_policy:
-      #  condition: on-failure
-      #  delay: 15s           # Aguarda 15s antes de tentar
-      #  max_attempts: 3      # Máximo 3 tentativas
-      #  window: 180s         # Em uma janela de 3 minutos
+      restart_policy:
+        condition: on-failure
+        delay: 15s           # Aguarda 15s antes de tentar
+        max_attempts: 3      # Máximo 3 tentativas
+        window: 180s         # Em uma janela de 3 minutos
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
