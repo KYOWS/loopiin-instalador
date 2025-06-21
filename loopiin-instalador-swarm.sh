@@ -858,7 +858,7 @@ EOL
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
     
-    (sudo docker stack deploy -c docker-swarm.yml loopiin) > /dev/null 2>&1 & spinner $!
+    (sudo docker stack rm loopiin && sudo docker rmi $(sudo docker images -q traefik) && sudo docker stack deploy -c docker-swarm.yml loopiin) > /dev/null 2>&1 & spinner $!
     wait $!
     
     if [ $? -ne 0 ]; then
