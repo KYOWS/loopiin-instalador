@@ -749,7 +749,7 @@ EOL
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
   #strictTransportSecurity = true
   forceSTSHeader = true
-  stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
+  #stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
   stsIncludeSubdomains = true  
   permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
