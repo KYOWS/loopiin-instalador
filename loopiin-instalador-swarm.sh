@@ -613,9 +613,9 @@ services:
     image: portainer/portainer-ce:lts
     container_name: portainer
     command:
-      -H tcp://tasks.agent:9001 --tlsskipverify
-      #- -H
-      #- tcp://tasks.agent:9001
+      #-H tcp://tasks.agent:9001 --tlsskipverify
+      - -H
+      - tcp://tasks.agent:9001
       #- --tlsverify
       #- --tlscacert=/certs/ca.pem
     volumes:
