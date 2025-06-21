@@ -768,8 +768,9 @@ EOL
   permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
     
 [http.middlewares.rateLimitMiddleware.rateLimit]
-  burst = 100
-  average = 50
+  burst = 150
+  average = 75
+  period = "1m"
 
 [http.routers.api]
   rule = "Host(\`$traefik_domain\`) || Host(\`www.$traefik_domain\`)"
