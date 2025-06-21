@@ -764,6 +764,8 @@ EOL
     "X-Forwarded-Proto: https",
     "X-Forwarded-Port: 443"
   ]
+  # Política de permissões
+  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
     
 [http.middlewares.rateLimitMiddleware.rateLimit]
   burst = 100
@@ -820,8 +822,6 @@ EOL
     else
         echo -e "${GREEN}✅ Docker Swarm já está ativo.${NC}"
     fi
-
-    sleep 5
 
     if ! sudo docker network ls | grep -q "web"; then
     echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
