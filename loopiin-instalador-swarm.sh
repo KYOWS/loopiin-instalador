@@ -773,26 +773,26 @@ EOL
   service = "api@internal"
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
-    options = "default@file"
+#   options = "default@file"
 
 # Configuração SSL/TLS aprimorada
-[tls.options]
-  [tls.options.default]
-    minVersion = "VersionTLS12"
-    maxVersion = "VersionTLS13"
-    cipherSuites = [
-      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",      
-      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
-    ]
-    curvePreferences = [
-      "X25519",
-      "secp521r1",
-      "secp384r1"
-    ]
+#[tls.options]
+#  [tls.options.default]
+#    minVersion = "VersionTLS12"
+#    maxVersion = "VersionTLS13"
+#    cipherSuites = [
+#      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
+#      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
+#      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",      
+#      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
+#      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
+#      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+#    ]
+#    curvePreferences = [
+#      "X25519",
+#      "secp521r1",
+#      "secp384r1"
+#    ]
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
