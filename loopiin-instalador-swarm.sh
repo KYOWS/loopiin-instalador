@@ -860,12 +860,19 @@ EOL
 
     echo -e "${YELLOW}🧹 Verificando e limpando instalações anteriores...${NC}"
 
-    # Passo 1: Verifica se a stack 'loopiin' existe antes de tentar removê-la.
-    # O comando `docker stack ls` com `grep` só terá saída se a stack existir.
+   # Passo 1: Verifica se a stack 'loopiin' existe antes de tentar removê-la.
     if [ ! -z "$(sudo docker stack ls --format '{{.Name}}' | grep '^loopiin$')" ]; then
-        echo -e "${YELLOW}-> Removendo stack 'loopiin' existente...${NC}"
-        (sudo docker stack rm loopiin) > /dev/null 2>&1 & spinner $!
-        wait $!        
+        echo -e "${YELLOW}-> Removendo stack 'loopiin' existente... (Isso pode levar um momento)${NC}"
+        sudo docker stack rm loopiin
+        
+        # PASSO CRÍTICO: Espera ATIVAMENTE a stack ser removida, verificando o status.
+        # Este laço 'while' é a única forma garantida de evitar a condição de corrida.
+        echo -n -e "${YELLOW}-> Aguardando a finalização completa da remoção${NC}"
+        while [ ! -z "$(sudo docker stack ls --format '{{.Name}}' | grep '^loopiin$')" ]; do
+            echo -n "."
+            sleep 2
+        done
+        # A quebra de linha garante que a próxima mensagem comece em uma nova linha.
         echo -e "\n${GREEN}✅ Stack anterior removida com sucesso.${NC}"
     else
         echo -e "${GREEN}✅ Nenhuma stack 'loopiin' anterior encontrada.${NC}"
