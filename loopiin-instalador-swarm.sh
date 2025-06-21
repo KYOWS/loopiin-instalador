@@ -760,7 +760,7 @@ EOL
     "X-Forwarded-Port: 443"
   ]
   # Política de permissões
-  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
+#  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
 
 [http.middlewares.rateLimitMiddleware.rateLimit]
   burst = 150
