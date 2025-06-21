@@ -620,7 +620,7 @@ services:
       #- --tlscacert=/certs/ca.pem
     volumes:
       - /docker/portainer/data:/data
-      - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
+      #- /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
     networks:
       - agent_network
       - web
