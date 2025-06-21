@@ -748,7 +748,8 @@ EOL
   frameDeny = true
   sslRedirect = true
   referrerPolicy = "strict-origin-when-cross-origin"  
-  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
+  #contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws:;"
+  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
   strictTransportSecurity = true
   forceSTSHeader = true
@@ -774,19 +775,16 @@ EOL
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
     options = "default@file"
-
+    
 # Configuração SSL/TLS aprimorada
 [tls.options]
-  [tls.options.default]
-    sslStrategies = ["tls.SniStrict"]
+  [tls.options.default]    
     minVersion = "VersionTLS12"
     maxVersion = "VersionTLS13"
     cipherSuites = [
       "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
       "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",      
       "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
       "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
       "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
