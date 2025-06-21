@@ -573,8 +573,7 @@ services:
       mode: replicated
       replicas: 1
       placement:
-        constraints:
-          - node.role == manager
+        constraints: [node.role == manager]
       restart_policy:
         condition: on-failure
         delay: 10s           # Aguarda 10s antes de tentar
