@@ -767,29 +767,7 @@ EOL
   middlewares = ["simpleAuth", "securityHeaders", "rateLimitMiddleware", "redirect-www-to-main"]  
   service = "api@internal"
   [http.routers.api.tls]
-    certResolver = "lets-encrypt"
-    options = "default@file"
-
-[tls.options]
-  [tls.options.default]
-    minVersion = "VersionTLS12"
-    maxVersion = "VersionTLS13"    
-    cipherSuites = [
-      # TLS 1.3
-      "TLS_AES_128_GCM_SHA256",
-      "TLS_AES_256_GCM_SHA384",
-      
-      # TLS 1.2
-      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"
-    ]
-    # Curvas mais compatíveis
-    curvePreferences = [
-      "secp384r1",
-      "secp256r1"
-    ]
+    certResolver = "lets-encrypt"    
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
