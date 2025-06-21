@@ -768,6 +768,31 @@ EOL
   service = "api@internal"
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
+    options = "default@file"
+
+[tls.options]
+  [tls.options.default]
+    minVersion = "VersionTLS12"
+    maxVersion = "VersionTLS13"
+    cipherSuites = [
+      # Cifras modernas para TLS 1.3
+      "TLS_AES_128_GCM_SHA256",
+      "TLS_AES_256_GCM_SHA384",
+      "TLS_CHACHA20_POLY1305_SHA256",
+      
+      # Cifras modernas para TLS 1.2
+      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",      
+      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",      
+      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256"      
+    ]
+    curvePreferences = [
+      "X25519",
+      "secp521r1",
+      "secp384r1"
+    ]
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
