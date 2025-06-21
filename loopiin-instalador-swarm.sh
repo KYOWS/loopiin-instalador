@@ -584,7 +584,7 @@ services:
         max-size: "10m"
         max-file: "3"    
   agent:
-    image: portainer/agent:lts
+    image: portainer/agent:2.31.0
     container_name: portainer-agent    
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -606,7 +606,7 @@ services:
         max-file: "3"    
 
   portainer:
-    image: portainer/portainer-ce:lts
+    image: portainer/portainer-ce:2.31.0
     container_name: portainer-ce
     command:      
       - -H
