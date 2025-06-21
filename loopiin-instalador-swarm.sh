@@ -569,6 +569,9 @@ services:
       - /docker/traefik/traefik.toml:/traefik.toml
       - /docker/traefik/traefik_dynamic.toml:/traefik_dynamic.toml
       - /docker/traefik/acme.json:/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
     deploy:
       mode: replicated
       replicas: 1
