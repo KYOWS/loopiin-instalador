@@ -807,7 +807,7 @@ EOL
     fi
 
      # Antes de 'sudo docker swarm init...'
-    if ! sudo docker info --format '{{.Swarm.LocalNodeState}}' | grep -q "active"; then
+    if ! sudo docker info --format '{{.Swarm.LocalNodeState}}' | grep -w -q "active"; then
         echo -e "${YELLOW}🐳 Inicializando Docker Swarm...${NC}"
         (sudo docker swarm init --advertise-addr "$SERVER_IP") > /dev/null 2>&1 & spinner $!
         wait $!
