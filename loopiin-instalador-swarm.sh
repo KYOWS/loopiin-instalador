@@ -548,7 +548,7 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
     cat <<EOL | sudo tee docker-swarm.yml > /dev/null
 services:  
   traefik:
-    image: traefik:latest
+    image: traefik:v3.4.1
     container_name: traefik 
     networks:
       - web
