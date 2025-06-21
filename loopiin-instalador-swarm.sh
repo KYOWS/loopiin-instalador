@@ -820,6 +820,8 @@ EOL
         echo -e "${GREEN}✅ Docker Swarm já está ativo.${NC}"
     fi
 
+    sleep 5
+
     if ! sudo docker network ls | grep -q "web"; then
     echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
     (sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
