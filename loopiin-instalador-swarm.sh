@@ -579,10 +579,7 @@ services:
         condition: on-failure
         delay: 10s           # Aguarda 10s antes de tentar
         max_attempts: 3      # Máximo 3 tentativas
-        window: 180s         # Em uma janela de 3 minutos
-    labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=web"
+        window: 180s         # Em uma janela de 3 minutos    
     logging:
       options:
         max-size: "10m"
