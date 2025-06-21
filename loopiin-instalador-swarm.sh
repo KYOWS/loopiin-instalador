@@ -592,8 +592,7 @@ services:
     container_name: portainer-agent    
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes
-      - /docker/portainer/data:/data
+      - /var/lib/docker/volumes:/var/lib/docker/volumes      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
       - /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
       - /docker/portainer/certs/agent.key:/certs/key.pem:ro
@@ -619,8 +618,7 @@ services:
       - --tlsverify
       - --tlscacert=/certs/ca.pem
     volumes:
-      - portainer_data:/data
-      #- /docker/portainer/data:/data
+      - portainer_data:/data      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
     networks:
       - agent_network
@@ -755,7 +753,7 @@ EOL
   frameDeny = true
   sslRedirect = true
   referrerPolicy = "strict-origin-when-cross-origin"  
-  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws;"
+  #contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws;"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
   strictTransportSecurity = true
   forceSTSHeader = true
