@@ -593,9 +593,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /docker/portainer/data:/data
-      - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
-      - /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
-      - /docker/portainer/certs/agent.key:/certs/key.pem:ro
+      #- /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
+      #- /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
+      #- /docker/portainer/certs/agent.key:/certs/key.pem:ro
     labels:
       - "traefik.enable=false" 
     networks:
@@ -613,10 +613,11 @@ services:
     image: portainer/portainer-ce:lts
     container_name: portainer
     command:
-      - -H
-      - tcp://tasks.agent:9001
-      - --tlsverify
-      - --tlscacert=/certs/ca.pem
+      -H tcp://tasks.agent:9001 --tlsskipverify
+      #- -H
+      #- tcp://tasks.agent:9001
+      #- --tlsverify
+      #- --tlscacert=/certs/ca.pem
     volumes:
       - /docker/portainer/data:/data
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
