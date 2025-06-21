@@ -768,18 +768,6 @@ EOL
   service = "api@internal"
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
-    options = "default@file"
-
-# Configuração SSL/TLS aprimorada
-[tls.options]
-  [tls.options.default]
-    minVersion = "VersionTLS12"
-    maxVersion = "VersionTLS13"    
-    curvePreferences = [
-      "X25519",
-      "secp521r1",
-      "secp384r1"
-    ]
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
