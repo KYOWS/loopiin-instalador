@@ -755,6 +755,12 @@ EOL
   stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
   stsIncludeSubdomains = true  
+  customRequestHeaders = [
+    "X-Forwarded-Proto: https",
+    "X-Forwarded-Port: 443"
+  ]
+  # Política de permissões
+  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
 
 [http.middlewares.rateLimitMiddleware.rateLimit]
   burst = 150
