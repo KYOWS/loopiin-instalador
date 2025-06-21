@@ -593,10 +593,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
-      #- /docker/portainer/data:/data
-      #- /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
-      #- /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
-      #- /docker/portainer/certs/agent.key:/certs/key.pem:ro
+      - /docker/portainer/data:/data
+      - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
+      - /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
+      - /docker/portainer/certs/agent.key:/certs/key.pem:ro
     labels:
       - "traefik.enable=false" 
     networks:
@@ -616,12 +616,12 @@ services:
     command:      
       - -H
       - tcp://tasks.agent:9001
-      #- --tlsverify
-      #- --tlscacert=/certs/ca.pem
+      - --tlsverify
+      - --tlscacert=/certs/ca.pem
     volumes:
       - portainer_data:/data
       #- /docker/portainer/data:/data
-      #- /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
+      - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
     networks:
       - agent_network
       - web
@@ -755,9 +755,9 @@ EOL
   frameDeny = true
   sslRedirect = true
   referrerPolicy = "strict-origin-when-cross-origin"  
-  #contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws;"
+  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws;"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
-  #strictTransportSecurity = true
+  strictTransportSecurity = true
   forceSTSHeader = true
   stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
