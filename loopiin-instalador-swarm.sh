@@ -568,10 +568,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /docker/traefik/traefik.toml:/traefik.toml
       - /docker/traefik/traefik_dynamic.toml:/traefik_dynamic.toml
-      - /docker/traefik/acme.json:/acme.json
-    labels:
-      - "traefik.enable=true"
-      - "traefik.docker.network=web"
+      - /docker/traefik/acme.json:/acme.json    
     deploy:
       mode: replicated
       replicas: 1
