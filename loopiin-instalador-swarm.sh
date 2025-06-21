@@ -753,24 +753,17 @@ EOL
   frameDeny = true
   sslRedirect = true
   referrerPolicy = "strict-origin-when-cross-origin"  
-  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' wss: ws;"
+  contentSecurityPolicy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
   # HSTS (Strict-Transport-Security) - Descomente se tiver certeza! Força o navegador a usar HTTPS para seu domínio por um período. Cuidado ao habilitar: se o HTTPS quebrar, seus usuários não conseguirão acessar por um tempo.
-  strictTransportSecurity = true
+  # strictTransportSecurity = true
   forceSTSHeader = true
   stsPreload = true # Opcional: Para incluir seu domínio na lista de pré-carregamento HSTS dos navegadores. Use com extrema cautela.
   stsSeconds = 31536000 # 1 ano
-  stsIncludeSubdomains = true
-  customRequestHeaders = [
-    "X-Forwarded-Proto: https",
-    "X-Forwarded-Port: 443"
-  ]
-  # Política de permissões
-  permissionsPolicy = "geolocation=(), microphone=(), camera=(), speaker=()"
+  stsIncludeSubdomains = true  
 
 [http.middlewares.rateLimitMiddleware.rateLimit]
   burst = 100
   average = 50
-  period = "1m"
 
 [http.routers.api]
   rule = "Host(\`$traefik_domain\`) || Host(\`www.$traefik_domain\`)"
@@ -779,29 +772,6 @@ EOL
   service = "api@internal"
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
-    options = "default@file"
-
-# Configuração SSL/TLS aprimorada
-[tls.options]
-  [tls.options.default]
-    sslStrategies = ["tls.SniStrict"]
-    minVersion = "VersionTLS12"
-    maxVersion = "VersionTLS13"
-    cipherSuites = [
-      "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_RSA_WITH_AES_256_GCM_SHA384",
-      "TLS_RSA_WITH_AES_128_GCM_SHA256",
-      "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
-      "TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305",
-      "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
-]
-    curvePreferences = [
-      "X25519",
-      "secp521r1",
-      "secp384r1"
-    ]
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
