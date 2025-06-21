@@ -589,7 +589,7 @@ services:
         max-file: "3"    
   agent:
     image: portainer/agent:lts
-    #container_name: portainer-agent    
+    container_name: portainer-agent    
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes
@@ -612,9 +612,8 @@ services:
 
   portainer:
     image: portainer/portainer-ce:lts
-    #container_name: portainer
-    command:
-      #-H tcp://tasks.agent:9001 --tlsskipverify
+    container_name: portainer-ce
+    command:      
       - -H
       - tcp://tasks.agent:9001
       - --tlsverify
