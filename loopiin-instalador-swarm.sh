@@ -856,35 +856,7 @@ EOL
 
     cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
     
-    echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"    
-
-    echo -e "${YELLOW}🧹 Verificando e limpando instalações anteriores...${NC}"
-
-   # Passo 1: Verifica se a stack 'loopiin' existe antes de tentar removê-la.
-    if [ ! -z "$(sudo docker stack ls --format '{{.Name}}' | grep '^loopiin$')" ]; then
-        echo -e "${YELLOW}-> Removendo stack 'loopiin' existente... (Isso pode levar um momento)${NC}"
-        sudo docker stack rm loopiin
-        
-        # PASSO CRÍTICO: Espera ATIVAMENTE a stack ser removida, verificando o status.
-        # Este laço 'while' é a única forma garantida de evitar a condição de corrida.
-        echo -n -e "${YELLOW}-> Aguardando a finalização completa da remoção${NC}"
-        while [ ! -z "$(sudo docker stack ls --format '{{.Name}}' | grep '^loopiin$')" ]; do
-            echo -n "."
-            sleep 2
-        done
-        # A quebra de linha garante que a próxima mensagem comece em uma nova linha.
-        echo -e "\n${GREEN}✅ Stack anterior removida com sucesso.${NC}"
-    else
-        echo -e "${GREEN}✅ Nenhuma stack 'loopiin' anterior encontrada.${NC}"
-    fi
-
-    # Passo 3: Remove as imagens do Traefik em cache, se existirem.
-    if [ ! -z "$(sudo docker images -q traefik)" ]; then
-        echo -e "${YELLOW}-> Removendo imagens do Traefik em cache...${NC}"
-        (sudo docker rmi $(sudo docker images -q traefik)) > /dev/null 2>&1 & spinner $!
-        wait $!
-        echo -e "${GREEN}✅ Imagens antigas do Traefik removidas.${NC}"
-    fi
+    echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"        
     
     (sudo docker stack deploy -c docker-swarm.yml loopiin) > /dev/null 2>&1 & spinner $!
     wait $!    
