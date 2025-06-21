@@ -773,7 +773,6 @@ EOL
 # Configuração SSL/TLS aprimorada
 [tls.options]
   [tls.options.default]
-    sslStrategies = ["tls.SniStrict"]
     minVersion = "VersionTLS12"
     maxVersion = "VersionTLS13"    
     curvePreferences = [
