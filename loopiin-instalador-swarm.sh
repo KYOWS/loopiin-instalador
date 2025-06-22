@@ -80,7 +80,7 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
 
     echo -e "${GREEN}✅ Firewall configurado e ativo.${NC}"
     # Apenas para mostrar um output mais limpo e focado
-    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789|9001') || sudo ufw status
+    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789') || sudo ufw status
     return 0
 }
 
