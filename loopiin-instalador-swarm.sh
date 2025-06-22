@@ -658,6 +658,7 @@ networks:
     external: true
 volumes:
   portainer_data:
+    driver: local
 EOL
     echo -e "${GREEN}✅ docker-swarm.yml criado com sucesso.${NC}"
 
