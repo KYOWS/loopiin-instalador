@@ -72,11 +72,7 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
         sudo ufw allow 2377/tcp    # Comunicação de gerenciamento do cluster
         sudo ufw allow 7946/tcp    # Comunicação entre nós
         sudo ufw allow 7946/udp    # Comunicação entre nós
-        sudo ufw allow 4789/udp    # Rede overlay
-        sudo ufw allow 9001/tcp    # Comunicação
-        sudo ufw allow 9443/tcp
-        sudo ufw allow 9000/tcp
-        sudo ufw allow 8000/tcp        
+        sudo ufw allow 4789/udp    # Rede overlay                   
     ) > /dev/null 2>&1
 
     echo -e "${YELLOW}Ativando o UFW...${NC}"
@@ -613,11 +609,7 @@ services:
       - -H
       - tcp://tasks.agent:9001
       - --tlsverify
-      - --tlscacert=/certs/ca.pem
-    ports:
-      - "9443:9443"
-      - "9000:9000"
-      - "8000:8000"
+      - --tlscacert=/certs/ca.pem   
     volumes:
       - portainer_data:/data      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
