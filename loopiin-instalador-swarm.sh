@@ -605,9 +605,9 @@ services:
 
   portainer:
     image: portainer/portainer-ce:2.31.0    
-    command:      
-      - -H
-      - tcp://tasks.agent:9001
+    command: -H tcp://tasks.agent:9001 --tlsskipverify
+      #- -H
+      #- tcp://tasks.agent:9001
       #- --tlsverify
       #- --tlscacert=/certs/ca.pem
     volumes:
