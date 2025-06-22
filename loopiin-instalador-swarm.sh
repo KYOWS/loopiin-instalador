@@ -226,7 +226,7 @@ install_docker_function() {
     newgrp docker && \
     # Iniciar e habilitar Docker
     sudo systemctl start docker && \
-    sudo systemctl enable docker && sudo docker volume create portainer_data
+    sudo systemctl enable docker
 }
 
 #########################
@@ -658,7 +658,6 @@ networks:
     external: true
 volumes:
   portainer_data:
-    driver: local
 EOL
     echo -e "${GREEN}✅ docker-swarm.yml criado com sucesso.${NC}"
 
