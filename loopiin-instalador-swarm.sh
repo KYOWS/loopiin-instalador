@@ -611,6 +611,10 @@ services:
       - tcp://tasks.agent:9001
       - --tlsverify
       - --tlscacert=/certs/ca.pem
+    ports:
+      - "9443:9443"
+      - "9000:9000"
+      - "8000:8000"
     volumes:
       - portainer_data:/data      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
