@@ -613,8 +613,6 @@ services:
     volumes:
       - portainer_data:/data      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
-      - /docker/portainer/certs/client.pem:/certs/cert.pem:ro
-      - /docker/portainer/certs/client.key:/certs/key.pem:ro
     networks:
       - agent_network
       - web
