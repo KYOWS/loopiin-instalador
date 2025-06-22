@@ -639,12 +639,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"
-    # Roteador e Serviço para a interface principal do Portainer (porta 9000)
+    # Roteador e Serviço para a interface principal do Portainer (porta 9443)
       - "traefik.http.routers.portainer.rule=Host(\`$portainer_domain\`) || Host(\`www.$portainer_domain\`)"
       - "traefik.http.routers.portainer.entrypoints=websecure"
       - "traefik.http.routers.portainer.tls=true"
       - "traefik.http.routers.portainer.tls.certresolver=lets-encrypt"
-      - "traefik.http.services.portainer-main.loadbalancer.server.port=9000" # Define um serviço Traefik chamado 'portainer-main'
+      - "traefik.http.services.portainer-main.loadbalancer.server.port=9443" # Define um serviço Traefik chamado 'portainer-main'
       - "traefik.http.routers.portainer.service=portainer-main" # O roteador 'portainer' usa o serviço 'portainer-main'
       - "traefik.http.routers.portainer.middlewares=redirect-www-to-main@file,securityHeaders@file,rateLimitMiddleware@file" # Adicionado o middleware para redirecionamento
     # Roteador e Serviço para o endpoint Edge do Portainer (porta 8000)
