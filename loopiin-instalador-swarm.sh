@@ -74,6 +74,9 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
         sudo ufw allow 7946/udp    # Comunicação entre nós
         sudo ufw allow 4789/udp    # Rede overlay
         sudo ufw allow 9001/tcp    # Comunicação
+        sudo ufw allow 9443/tcp
+        sudo ufw allow 9000/tcp
+        sudo ufw allow 8000/tcp        
     ) > /dev/null 2>&1
 
     echo -e "${YELLOW}Ativando o UFW...${NC}"
