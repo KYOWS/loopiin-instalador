@@ -73,6 +73,7 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
         sudo ufw allow 7946/tcp    # Comunicação entre nós
         sudo ufw allow 7946/udp    # Comunicação entre nós
         sudo ufw allow 4789/udp    # Rede overlay
+        sudo ufw allow 9001/tcp    # Comunicação
     ) > /dev/null 2>&1
 
     echo -e "${YELLOW}Ativando o UFW...${NC}"
@@ -80,7 +81,7 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
 
     echo -e "${GREEN}✅ Firewall configurado e ativo.${NC}"
     # Apenas para mostrar um output mais limpo e focado
-    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789') || sudo ufw status
+    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789|9001') || sudo ufw status
     return 0
 }
 
@@ -829,7 +830,7 @@ EOL
     
     echo -e "${YELLOW}🚀 Iniciando containers Docker...${NC}"        
     
-    (sudo docker stack deploy -c docker-swarm.yml loopiin) > /dev/null 2>&1 & spinner $!
+    (sudo docker stack deploy -c docker-swarm.yml portainer) > /dev/null 2>&1 & spinner $!
     wait $!    
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao iniciar os containers Docker. Verifique a saída de 'sudo docker stack deploy'.${NC}"
