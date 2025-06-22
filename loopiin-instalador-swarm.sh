@@ -583,7 +583,7 @@ services:
         max-size: "10m"
         max-file: "3"    
   agent:
-    image: portainer/agent:lts      
+    image: portainer/agent:2.27.7      
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes      
@@ -604,7 +604,7 @@ services:
         max-file: "3"    
 
   portainer:
-    image: portainer/portainer-ce:lts    
+    image: portainer/portainer-ce:2.27.7    
     command:
       - -H
       - tcp://tasks.agent:9001
