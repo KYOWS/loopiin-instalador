@@ -588,8 +588,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/volumes:/var/lib/docker/volumes      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
-      - /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
-      - /docker/portainer/certs/agent.key:/certs/key.pem:ro
+      #- /docker/portainer/certs/agent.pem:/certs/cert.pem:ro
+      #- /docker/portainer/certs/agent.key:/certs/key.pem:ro
     labels:
       - "traefik.enable=false" 
     networks:
