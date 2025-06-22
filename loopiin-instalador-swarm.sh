@@ -226,7 +226,7 @@ install_docker_function() {
     newgrp docker && \
     # Iniciar e habilitar Docker
     sudo systemctl start docker && \
-    sudo systemctl enable docker
+    sudo systemctl enable docker && sudo docker volume create portainer_data
 }
 
 #########################
