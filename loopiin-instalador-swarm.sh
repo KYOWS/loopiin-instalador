@@ -567,7 +567,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /docker/traefik/traefik.toml:/traefik.toml
       - /docker/traefik/traefik_dynamic.toml:/traefik_dynamic.toml
-      - /docker/traefik/acme.json:/acme.json    
+      - /docker/traefik/acme.json:/acme.json   
+      #- /docker/traefik/certs:/certs:ro
     deploy:
       mode: replicated
       replicas: 1
@@ -764,7 +765,13 @@ EOL
   middlewares = ["simpleAuth", "securityHeaders", "rateLimitMiddleware", "redirect-www-to-main"]  
   service = "api@internal"
   [http.routers.api.tls]
-    certResolver = "lets-encrypt"    
+    certResolver = "lets-encrypt"
+
+#[tls.stores]
+#  [tls.stores.default]
+#    [tls.stores.default.defaultCertificate]
+#      certFile = "/certs/cloudflare.pem"
+#      keyFile = "/certs/cloudflare.key"    
 EOL
     echo -e "${GREEN}✅ traefik_dynamic.toml criado com sucesso.${NC}"
 
