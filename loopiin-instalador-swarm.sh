@@ -766,6 +766,10 @@ EOL
   service = "api@internal"
   [http.routers.api.tls]
     certResolver = "lets-encrypt"
+    
+#[[tls.certificates]]
+#  certFile = "/etc/traefik/certs/cloudflare.pem"
+#  keyFile = "/etc/traefik/certs/cloudflare.key"
 
 #[tls.stores]
 #  [tls.stores.default]
