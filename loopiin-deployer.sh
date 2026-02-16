@@ -1092,7 +1092,7 @@ else
             echo -e "${BLUE}Para conectar este nó ao cluster, vá no terminal do MESTRE e rode:${NC}"
             echo -e "  docker swarm join-token worker"
             echo -e "${YELLOW}📋 Cole aqui o comando de join fornecido pelo nó manager:${NC}"
-            read -p "> " join_cmd
+            read -r -p "> " join_cmd
             
         # Validação de segurança do comando
         if [[ "$join_cmd" =~ ^docker\ swarm\ join\ --token\ [A-Za-z0-9]+\ .+:[0-9]+$ ]]; then
