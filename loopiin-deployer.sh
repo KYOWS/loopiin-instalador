@@ -687,7 +687,13 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
     check_openssl || { echo -e "${RED}❌ Não foi possível instalar o openssl. Saindo.${NC}"; exit 1; }
    
     # Configuração do Firewall
-    configure_firewall || { echo -e "${RED}❌ Não foi possível configurar o firewall. Saindo.${NC}"; exit 1; }
+    setup_wireguard || { echo -e "${RED}❌ Não foi possível configurar o wireguard. Saindo.${NC}"; exit 1; }
+
+    # Configurar Segurança (SSH Key)
+    setup_security || { echo -e "${RED}❌ Não foi possível configurar a segurança (SSH Key). Saindo.${NC}"; exit 1; }
+
+    # Configurar Storage (NFS)
+    setup_nfs_storage || { echo -e "${RED}❌ Não foi possível configurar o storage (NFS). Saindo.${NC}"; exit 1; }
 
     encrypted_password=$(htpasswd -nb -B -C 10 "$traefik_user" "$traefik_senha")
     
