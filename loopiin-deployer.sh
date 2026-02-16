@@ -424,7 +424,7 @@ install_docker_function() {
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
     # Adicionar usuário atual ao grupo docker
     sudo usermod -aG docker $USER && \
-    newgrp docker && \
+    #newgrp docker && \
     # Iniciar e habilitar Docker
     sudo systemctl start docker && \
     sudo systemctl enable docker
@@ -735,6 +735,8 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
         fi
         echo -e "${GREEN}✅ Docker instalado com sucesso.${NC}"
     fi
+    
+WG_PUB=$(sudo cat /etc/wireguard/public.key)
 
 if [ "$node_num" == "1" ]; then
         echo -e "${YELLOW}👑 Configurando Nó MESTRE (Líder)...${NC}"    
@@ -1061,8 +1063,6 @@ EOL
     fi
     echo -e "${GREEN}✅ Containers iniciados com sucesso.${NC}"
     sleep 3
-
-    WG_PUB=$(sudo cat /etc/wireguard/public.key)
     
     clear
     show_animated_logo
