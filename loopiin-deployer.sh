@@ -60,7 +60,18 @@ node_num=""
 #####################################################
 ##### Função para Configurar WireGuard e Nó #########
 #####################################################
-setup_wireguard() {    
+setup_wireguard() {
+    echo -e "${BLUE}Configurando o firewall (UFW)...${NC}"
+    if ! command -v ufw &> /dev/null; then
+        echo -e "${YELLOW}Instalando UFW...${NC}"
+        (sudo apt-get update -y && sudo apt-get install ufw -y) > /dev/null 2>&1 & spinner $!
+        wait $!
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ Erro ao instalar UFW.${NC}"
+            return 1
+        fi
+    fi
+    
     echo -e "${BLUE}🛡️ Configurando Rede Privada WireGuard...${NC}"
 
     # 1. Identificar o número do nó
@@ -126,16 +137,20 @@ EOL
         sudo ufw allow in on $WG_INTERFACE from ${WG_NET}.0/24 to any port 2049 proto tcp comment "NFS Storage (VPN)"
     ) > /dev/null 2>&1
 
+    echo -e "${YELLOW}Ativando o UFW...${NC}"
+    (echo "y" | sudo ufw --force enable) > /dev/null 2>&1
+
+    echo -e "${GREEN}✅ Firewall configurado e ativo.${NC}"
+
     # Ativar WireGuard
     sudo systemctl enable wg-quick@$WG_INTERFACE > /dev/null 2>&1
     sudo systemctl restart wg-quick@$WG_INTERFACE > /dev/null 2>&1
 
     echo -e "${GREEN}✅ WireGuard configurado como Nó $node_num (IP: $NODE_IP)${NC}"
-    echo -e "${BLUE}==============================================================${NC}"
-    echo -e "🔑 SUA CHAVE PÚBLICA (COPIE ISTO): ${YELLOW}$pub_key${NC}"
-    echo -e "${BLUE}==============================================================${NC}"
-    echo ""
-    read -p "Pressione [Enter] para continuar..."
+    
+    # Apenas para mostrar um output mais limpo e focado
+    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789') || sudo ufw status
+    return 0    
 }
 
 #####################################################
