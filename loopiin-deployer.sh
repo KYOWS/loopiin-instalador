@@ -60,8 +60,7 @@ NFS_CLIENT_PATH="/mnt/nfs"
 #####################################################
 ##### Função para Configurar WireGuard e Nó #########
 #####################################################
-setup_wireguard() {
-    show_animated_logo
+setup_wireguard() {    
     echo -e "${BLUE}🛡️ Configurando Rede Privada WireGuard...${NC}"
 
     # 1. Identificar o número do nó
@@ -202,8 +201,7 @@ EOF
 #####################################################
 ##### Função para Setup de Storage (NFS) ############
 #####################################################
-setup_nfs_storage() {
-    show_animated_logo
+setup_nfs_storage() {    
     echo -e "${BLUE}📁 Configurando Storage Compartilhado (NFS)...${NC}"
 
     # Criar o grupo 'app' com ID 1011
