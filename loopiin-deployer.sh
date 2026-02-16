@@ -1077,7 +1077,7 @@ else
             read -p "> " join_cmd
             
             # Executa o comando que você colou
-            eval "sudo $join_cmd"
+            sudo $join_cmd
             
             if [ $? -eq 0 ]; then
                  echo -e "${GREEN}✅ Nó conectado ao cluster com sucesso!${NC}"
