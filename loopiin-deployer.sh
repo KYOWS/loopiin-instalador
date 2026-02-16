@@ -197,6 +197,9 @@ setup_security() {
 
     # 2. Fail2Ban
     echo -e "${BLUE}👮 Configurando Fail2Ban...${NC}"
+    echo -e "${YELLOW}📦 Instalando pacote Fail2Ban...${NC}"
+    (sudo apt-get update && sudo apt-get install -y fail2ban) > /dev/null 2>&1 & spinner $!
+    wait $!
     cat <<EOF | sudo tee /etc/fail2ban/jail.local > /dev/null
 [DEFAULT]
 ignoreip = 127.0.0.1/8 ::1 ${WG_NET}.0/24
