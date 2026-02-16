@@ -871,6 +871,7 @@ networks:
   agent_network:
     driver: overlay
     attachable: true
+    name: agent_network
   web:
     external: true
 volumes:
