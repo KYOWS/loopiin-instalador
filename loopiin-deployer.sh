@@ -805,7 +805,7 @@ services:
       - --tlsverify
       - --tlscacert=/certs/ca.pem   
     volumes:
-      - portainer_data:/data      
+      - $NFS_CLIENT_PATH/portainer_data:/data      
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
     networks:
       - agent_network
@@ -993,8 +993,9 @@ EOL
 
     cd || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
 
-    # Pega o primeiro IP da máquina
-    SERVER_IP=$(curl -s ifconfig.me)
+    # Pega o IP da VPN (WireGuard) para segurança
+    # Como definimos lá em cima que o Mestre é o .1
+    SERVER_IP="10.100.0.1"
     if [ -z "$SERVER_IP" ]; then
         echo -e "${RED}❌ Não foi possível detectar o endereço IP do servidor.${NC}"
         exit 1
