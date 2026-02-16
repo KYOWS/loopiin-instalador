@@ -148,7 +148,30 @@ EOL
 
     echo -e "${GREEN}✅ WireGuard configurado como Nó $node_num (IP: $NODE_IP)${NC}"
     
-    # Apenas para mostrar um output mais limpo e focado
+    #Validação de Conectividade VPN
+    echo -e "${BLUE}🔍 Validando conectividade da VPN...${NC}"
+    
+    # Aguarda alguns segundos para a interface estabilizar
+    sleep 3
+    
+    # Verifica se a interface wg0 está UP
+    if ! ip link show $WG_INTERFACE | grep -q "state UP"; then
+        echo -e "${RED}❌ Interface WireGuard ($WG_INTERFACE) não está ativa.${NC}"
+        return 1
+    fi
+    
+    # Verifica se consegue pingar o próprio IP da VPN
+    if ping -c 2 -W 2 "$NODE_IP" > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ Interface VPN responde ao ping (IP: $NODE_IP)${NC}"
+    else
+        echo -e "${YELLOW}⚠️  Aviso: Não foi possível pingar o próprio IP da VPN.${NC}"
+    fi
+    
+    echo -e "${BLUE}📝 IMPORTANTE: Após configurar todos os nós, teste a conectividade:${NC}"
+    echo -e "${YELLOW}   ping 10.100.0.2  # (do nó 8 para o nó 2)${NC}"
+    echo -e "${YELLOW}   ping 10.100.0.4  # (do nó 8 para o nó 4)${NC}"
+    echo -e "${YELLOW}   ping 10.100.0.8  # (do nó 2/4 para o nó 8)${NC}"
+    
     (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789|51820') || sudo ufw status
     return 0    
 }
