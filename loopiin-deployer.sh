@@ -84,6 +84,95 @@ echo -e "${YELLOW}Liberando portas essenciais...${NC}"
     return 0
 }
 
+#####################################################
+##### Variáveis Globais para WireGuard e Nó #########
+#####################################################
+WG_INTERFACE="wg0"
+WG_PORT=51820
+WG_NET="10.100.0"
+
+#####################################################
+##### Função para Configurar WireGuard e Nó #########
+#####################################################
+setup_wireguard() {
+    show_animated_logo
+    echo -e "${BLUE}🛡️ Configurando Rede Privada WireGuard...${NC}"
+
+    # 1. Identificar o número do nó
+    while true; do
+        read -p "🔢 Qual o número deste nó no cluster? (1, 2, 3...): " node_num
+        if [[ "$node_num" =~ ^[0-9]+$ ]] && [ "$node_num" -gt 0 ]; then
+            NODE_IP="${WG_NET}.${node_num}"
+            break
+        else
+            echo -e "${RED}❌ Por favor, insira um número válido.${NC}"
+        fi
+    done
+
+    # 2. Instalar WireGuard
+    echo -e "${YELLOW}📦 Instalando WireGuard...${NC}"
+    (sudo apt-get update && sudo apt-get install -y wireguard) > /dev/null 2>&1 & spinner $!
+    wait $!
+
+    # 3. Gerar chaves
+    local WG_DIR="/etc/wireguard"
+    sudo mkdir -p "$WG_DIR"
+    sudo chmod 700 "$WG_DIR"
+
+    if [ ! -f "$WG_DIR/private.key" ]; then
+        echo -e "${YELLOW}🔑 Gerando chaves de segurança...${NC}"
+        (
+            sudo wg genkey | sudo tee "$WG_DIR/private.key" | sudo wg pubkey | sudo tee "$WG_DIR/public.key" > /dev/null
+            sudo chmod 600 "$WG_DIR/private.key"
+            sudo chmod 644 "$WG_DIR/public.key"
+        ) > /dev/null 2>&1
+    fi
+
+    local priv_key=$(sudo cat "$WG_DIR/private.key")
+    local pub_key=$(sudo cat "$WG_DIR/public.key")
+
+    # 4. Criar arquivo de configuração base
+    cat <<EOL | sudo tee "$WG_DIR/$WG_INTERFACE.conf" > /dev/null
+[Interface]
+Address = ${NODE_IP}/24
+ListenPort = ${WG_PORT}
+PrivateKey = ${priv_key}
+
+# Peears devem ser adicionados manualmente após a instalação em todos os nós
+EOL
+
+    # 5. Ajustar Firewall UFW para WireGuard e SSH (Lógica de IP Dinâmico)
+    echo -e "${YELLOW}🔥 Ajustando Firewall para VPN e SSH Seguro...${NC}"
+    (
+        sudo ufw allow ${WG_PORT}/udp comment "WireGuard"
+        sudo ufw allow 22/tcp comment "SSH Publico (Reforçado por Fail2Ban)"
+        
+        # Se for o nó 1, libera portas Web
+        if [ "$node_num" == "1" ]; then
+            sudo ufw allow 80/tcp comment "HTTP Traefik"
+            sudo ufw allow 443/tcp comment "HTTPS Traefik"
+        fi
+
+        # Libera tráfego interno do Swarm APENAS pela interface da VPN
+        sudo ufw allow in on $WG_INTERFACE from ${WG_NET}.0/24 to any port 2377 proto tcp comment "Swarm Control (VPN)"
+        sudo ufw allow in on $WG_INTERFACE from ${WG_NET}.0/24 to any port 7946 proto tcp comment "Swarm Gossip TCP (VPN)"
+        sudo ufw allow in on $WG_INTERFACE from ${WG_NET}.0/24 to any port 7946 proto udp comment "Swarm Gossip UDP (VPN)"
+        sudo ufw allow in on $WG_INTERFACE from ${WG_NET}.0/24 to any port 4789 proto udp comment "Swarm VXLAN (VPN)"
+        sudo ufw allow in on $WG_INTERFACE from ${WG_NET}.0/24 to any port 2049 proto tcp comment "NFS Storage (VPN)"
+    ) > /dev/null 2>&1
+
+    # Ativar WireGuard
+    sudo systemctl enable wg-quick@$WG_INTERFACE > /dev/null 2>&1
+    sudo systemctl restart wg-quick@$WG_INTERFACE > /dev/null 2>&1
+
+    echo -e "${GREEN}✅ WireGuard configurado como Nó $node_num (IP: $NODE_IP)${NC}"
+    echo -e "${BLUE}==============================================================${NC}"
+    echo -e "🔑 SUA CHAVE PÚBLICA (COPIE ISTO): ${YELLOW}$pub_key${NC}"
+    echo -e "${BLUE}==============================================================${NC}"
+    echo ""
+    read -p "Pressione [Enter] para continuar..."
+}
+
 ###############################################################
 ##### Função para gerar certificados TLS para o Portainer #####
 ###############################################################
