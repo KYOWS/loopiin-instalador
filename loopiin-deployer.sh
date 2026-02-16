@@ -722,7 +722,7 @@ if [ "$node_num" == "1" ]; then
         echo -e "${YELLOW}👑 Configurando Nó MESTRE (Líder)...${NC}"    
 
     echo -e "${YELLOW}📁 Criando diretórios e configurando...${NC}"
-    (sudo mkdir -p /docker/traefik && sudo mkdir -p /docker/portainer/data) > /dev/null 2>&1 & spinner $!
+    (sudo mkdir -p /docker/traefik && sudo mkdir -p /docker/portainer && sudo mkdir -p /docker/portainer/data) > /dev/null 2>&1 & spinner $!
     wait $!
     if [ $? -ne 0 ]; then
         echo -e "${RED}❌ Erro ao criar diretórios. Verifique suas permissões.${NC}"
