@@ -981,7 +981,7 @@ EOL
     
     echo -e "${YELLOW}📝 Configurando permissões para acme.json...${NC}"
     
-    if [ ! -f acme.json ]; then
+    if [ ! -f /docker/traefik/acme.json ]; then
       (sudo touch acme.json && sudo chmod 600 acme.json) > /dev/null 2>&1 & spinner $! 
       wait $!
     fi
