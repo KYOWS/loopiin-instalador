@@ -149,7 +149,7 @@ EOL
     echo -e "${GREEN}✅ WireGuard configurado como Nó $node_num (IP: $NODE_IP)${NC}"
     
     # Apenas para mostrar um output mais limpo e focado
-    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789') || sudo ufw status
+    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789|51820') || sudo ufw status
     return 0    
 }
 
