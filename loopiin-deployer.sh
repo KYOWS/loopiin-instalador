@@ -718,6 +718,9 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
         echo -e "${GREEN}✅ Docker instalado com sucesso.${NC}"
     fi
 
+if [ "$node_num" == "1" ]; then
+        echo -e "${YELLOW}👑 Configurando Nó MESTRE (Líder)...${NC}"    
+
     echo -e "${YELLOW}📁 Criando diretórios e configurando...${NC}"
     (sudo mkdir -p /docker/traefik && sudo mkdir -p /docker/portainer/data) > /dev/null 2>&1 & spinner $!
     wait $!
@@ -1043,7 +1046,7 @@ EOL
     
     clear
     show_animated_logo
-
+ 
     echo -e "${GREEN}🎉 Instalação concluída com sucesso!${NC}"
     echo -e "${BLUE}📝 Informações de Acesso:${NC}"
     echo -e "${GREEN}================================${NC}"
@@ -1055,6 +1058,35 @@ EOL
     echo -e "${BLUE}➡️ Lembre-se de configurar os registros DNS (A/AAAA) para os domínios acima apontarem para este servidor!${NC}"
     echo -e "${GREEN}🌟 Visite: https://loopiin.com.br${NC}"
     echo -e "${BLUE}➡️ Criado por Wallison Santos${NC}"
+
+else
+        # ========================================================
+        # --- LÓGICA DO WORKER (NÓS 2, 3...) - APENAS JOIN ---
+        # ========================================================
+        echo -e "${YELLOW}👷 Configurando Nó WORKER (Trabalhador)...${NC}"
+        
+        if ! sudo docker info | grep -q "Swarm: active"; then
+            echo -e "${BLUE}Para conectar este nó ao cluster, vá no terminal do MESTRE e rode:${NC}"
+            echo -e "  docker swarm join-token worker"
+            echo -e "${BLUE}Copie o comando completo e cole abaixo:${NC}"
+            read -p "> " join_cmd
+            
+            # Executa o comando que você colou
+            eval "sudo $join_cmd"
+            
+            if [ $? -eq 0 ]; then
+                 echo -e "${GREEN}✅ Nó conectado ao cluster com sucesso!${NC}"
+            else
+                 echo -e "${RED}❌ Falha ao conectar. Verifique se o Mestre está rodando e a VPN conectada.${NC}"
+            fi
+        else
+            echo -e "${GREEN}✅ Este nó já faz parte do Swarm.${NC}"
+        fi
+        
+        echo -e "\n${GREEN}🎉 Configuração do Worker finalizada!${NC}"
+        echo -e "${YELLOW}Agora você pode adicionar este nó no arquivo /etc/wireguard/wg0.conf dos outros servidores.${NC}"
+    fi
+
 else
     echo -e "${RED}❌ Instalação cancelada. Por favor, inicie novamente se desejar prosseguir.${NC}"
     exit 0
