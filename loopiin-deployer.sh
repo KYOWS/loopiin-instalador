@@ -683,7 +683,11 @@ if [[ "$confirma1" =~ ^[Yy]$ ]]; then
         echo -e "${RED}❌ Erro ao atualizar o sistema e instalar dependências. Verifique sua conexão ou permissões.${NC}"
         exit 1
     fi
+
+    # Configuração do apache2_utils
     check_apache2_utils || { echo -e "${RED}❌ Não foi possível instalar o apache2-utils. Saindo.${NC}"; exit 1; }
+
+    # Configuração do openssl
     check_openssl || { echo -e "${RED}❌ Não foi possível instalar o openssl. Saindo.${NC}"; exit 1; }
    
     # Configuração do Firewall
