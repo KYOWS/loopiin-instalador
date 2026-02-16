@@ -994,7 +994,7 @@ EOL
     
     # Entra no diretório /docker para criar os arquivos
 
-    cd || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
+    cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
 
     # Pega o IP da VPN (WireGuard) para segurança
     # Como definimos lá em cima que o Mestre é o .1
