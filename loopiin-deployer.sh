@@ -48,42 +48,6 @@ check_openssl() {
     return 0
 }
 
-#################################################
-##### Função para configurar o Firewall UFW #####
-#################################################
-configure_firewall() {
-    echo -e "${BLUE}Configurando o firewall (UFW)...${NC}"
-    if ! command -v ufw &> /dev/null; then
-        echo -e "${YELLOW}Instalando UFW...${NC}"
-        (sudo apt-get update -y && sudo apt-get install ufw -y) > /dev/null 2>&1 & spinner $!
-        wait $!
-        if [ $? -ne 0 ]; then
-            echo -e "${RED}❌ Erro ao instalar UFW.${NC}"
-            return 1
-        fi
-    fi
-    
-echo -e "${YELLOW}Liberando portas essenciais...${NC}"
-    (
-        sudo ufw allow 22/tcp      # IMPORTANTE: Garante que a conexão SSH não seja perdida
-        sudo ufw allow 80/tcp      # Porta HTTP para redirecionamento do Traefik
-        sudo ufw allow 443/tcp     # Porta HTTPS para tráfego seguro do Traefik
-        # Portas necessárias para o funcionamento do Docker Swarm
-        sudo ufw allow 2377/tcp    # Comunicação de gerenciamento do cluster
-        sudo ufw allow 7946/tcp    # Comunicação entre nós
-        sudo ufw allow 7946/udp    # Comunicação entre nós
-        sudo ufw allow 4789/udp    # Rede overlay                   
-    ) > /dev/null 2>&1
-
-    echo -e "${YELLOW}Ativando o UFW...${NC}"
-    (echo "y" | sudo ufw enable) > /dev/null 2>&1
-
-    echo -e "${GREEN}✅ Firewall configurado e ativo.${NC}"
-    # Apenas para mostrar um output mais limpo e focado
-    (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789') || sudo ufw status
-    return 0
-}
-
 #####################################################
 ##### Variáveis Globais para WireGuard e Nó #########
 #####################################################
