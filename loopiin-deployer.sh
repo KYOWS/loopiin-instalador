@@ -1095,7 +1095,7 @@ else
             read -r -p "> " join_cmd
             
         # Validação de segurança do comando
-        if [[ "$join_cmd" =~ ^docker\ swarm\ join\ --token\ [A-Za-z0-9]+\ .+:[0-9]+$ ]]; then
+        if [[ "$join_cmd" =~ ^docker\ swarm\ join\ --token\ [A-Za-z0-9._-]+\ [0-9.:]+$ ]]; then
             sudo $join_cmd
 
             if [ $? -eq 0 ]; then
