@@ -1068,16 +1068,18 @@ EOL
     fi
 
     if ! sudo docker network ls | grep -q "web"; then
-    echo -e "${YELLOW}🌐 Criando rede Docker 'web'...${NC}"
-    (sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
-    wait $!
-    if [ $? -ne 0 ]; then
-        echo -e "${RED}❌ Erro ao criar a rede Docker 'web'.${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}✅ Rede Docker 'web' criada com sucesso.${NC}"
+        echo -e "${YELLOW}🌐 Criando rede Docker Overlay 'web'...${NC}"
+        echo -e "${BLUE}ℹ️  Esta rede será automaticamente replicada para todos os nós do Swarm.${NC}"
+        (sudo docker network create --driver=overlay --attachable=true web) > /dev/null 2>&1 & spinner $!
+        wait $!
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}❌ Erro ao criar a rede Docker 'web'.${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✅ Rede Docker 'web' criada com sucesso.${NC}"
+        echo -e "${BLUE}ℹ️  A rede 'web' está disponível em todos os nós do cluster.${NC}"
     else
-    echo -e "${GREEN}✅ Rede Docker 'web' já existe.${NC}"
+        echo -e "${GREEN}✅ Rede Docker 'web' já existe.${NC}"
     fi
 
     cd /docker || { echo -e "${RED}❌ Não foi possível mudar para o diretório /docker.${NC}"; exit 1; }
