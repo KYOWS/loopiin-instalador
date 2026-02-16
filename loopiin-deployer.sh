@@ -281,12 +281,23 @@ setup_nfs_storage() {
         echo -e "${GREEN}✅ Servidor NFS pronto em $NFS_SERVER_PATH${NC}"
         
         # 4. Bind Mount Local (Para o Mestre ver igual aos Workers)
-        # Substituímos '/mnt/nfs' por '$NFS_CLIENT_PATH'
         sudo mkdir -p $NFS_CLIENT_PATH
         if ! grep -q "$NFS_CLIENT_PATH" /etc/fstab; then
             echo "$NFS_SERVER_PATH $NFS_CLIENT_PATH none bind 0 0" | sudo tee -a /etc/fstab > /dev/null
             sudo mount -a 2>/dev/null
         fi
+
+        # 5. Validação do Bind Mount
+        if mountpoint -q "$NFS_CLIENT_PATH"; then
+            echo -e "${GREEN}✅ Bind mount configurado corretamente em $NFS_CLIENT_PATH${NC}"
+        else
+            echo -e "${RED}❌ Erro: Bind mount falhou. Verifique o fstab.${NC}"
+            sudo mount -a
+            if ! mountpoint -q "$NFS_CLIENT_PATH"; then
+                echo -e "${RED}❌ Não foi possível montar $NFS_CLIENT_PATH. Verifique as permissões.${NC}"
+                exit 1
+            fi
+         fi
 
     else
         echo -e "${YELLOW}🔌 Configurando este servidor como CLIENTE do Storage...${NC}"
