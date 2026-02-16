@@ -1043,6 +1043,8 @@ EOL
     fi
     echo -e "${GREEN}✅ Containers iniciados com sucesso.${NC}"
     sleep 3
+
+    WG_PUB=$(sudo cat /etc/wireguard/public.key)
     
     clear
     show_animated_logo
@@ -1052,6 +1054,9 @@ EOL
     echo -e "${GREEN}================================${NC}"
     echo -e "🔗 Portainer: ${YELLOW}https://$portainer_domain${NC}"
     echo -e "🔗 Traefik: ${YELLOW}https://$traefik_domain${NC}"
+    echo -e "${GREEN}================================${NC}"
+    echo -e "🔑 WireGuard Public Key (Copie para os Peers):"
+       echo -e "${YELLOW}$WG_PUB${NC}"
     echo -e "${GREEN}================================${NC}"
     echo ""
     echo -e "${BLUE}💡 Dica: Aguarde alguns minutos para que os certificados SSL sejam gerados pelo Let's Encrypt.${NC}"
