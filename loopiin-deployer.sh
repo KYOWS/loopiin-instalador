@@ -1018,11 +1018,17 @@ EOL
 
     # Pega o IP da VPN (WireGuard) para segurança
     # Como definimos lá em cima que o Mestre é o .1
+    # Pega o IP da VPN (WireGuard) para segurança
     SERVER_IP="$NODE_IP"
-    if [ -z "$SERVER_IP" ]; then
-        echo -e "${RED}❌ Não foi possível detectar o endereço IP do servidor.${NC}"
+
+    # Valida se NODE_IP foi definido corretamente
+    if [ -z "$SERVER_IP" ] || [ "$SERVER_IP" == "null" ]; then
+        echo -e "${RED}❌ Erro: IP da VPN (NODE_IP) não foi definido corretamente.${NC}"
+        echo -e "${YELLOW}Verifique se a função setup_wireguard() foi executada com sucesso.${NC}"
         exit 1
     fi
+
+    echo -e "${BLUE}🔍 IP da VPN detectado: ${YELLOW}${SERVER_IP}${NC}"
 
      # Antes de 'sudo docker swarm init...'
     if ! sudo docker info --format '{{.Swarm.LocalNodeState}}' | grep -w -q "active"; then
