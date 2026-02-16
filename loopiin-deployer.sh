@@ -828,7 +828,7 @@ services:
       - --tlsverify
       - --tlscacert=/certs/ca.pem   
     volumes:
-      - portainer_data:/data
+      - ${NFS_CLIENT_PATH}/portainer_data:/data
       - /docker/portainer/certs/ca.pem:/certs/ca.pem:ro
     networks:
       - agent_network
@@ -875,13 +875,6 @@ networks:
   web:
     external: true
     name: web
-volumes:
-  portainer_data:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=10.100.0.1,nfsvers=4.2,rw
-      device: ":/swarm_data/portainer_data"
 EOL
     echo -e "${GREEN}✅ docker-swarm.yml criado com sucesso.${NC}"
 
