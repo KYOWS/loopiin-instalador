@@ -1091,17 +1091,22 @@ else
         if ! sudo docker info | grep -q "Swarm: active"; then
             echo -e "${BLUE}Para conectar este nó ao cluster, vá no terminal do MESTRE e rode:${NC}"
             echo -e "  docker swarm join-token worker"
-            echo -e "${BLUE}Copie o comando completo e cole abaixo:${NC}"
+            echo -e "${YELLOW}📋 Cole aqui o comando de join fornecido pelo nó manager:${NC}"
             read -p "> " join_cmd
             
-            # Executa o comando que você colou
+        # Validação de segurança do comando
+        if [[ "$join_cmd" =~ ^docker\ swarm\ join\ --token\ [A-Za-z0-9]+\ .+:[0-9]+$ ]]; then
             sudo $join_cmd
-            
+
             if [ $? -eq 0 ]; then
-                 echo -e "${GREEN}✅ Nó conectado ao cluster com sucesso!${NC}"
+                echo -e "${GREEN}✅ Nó conectado ao cluster com sucesso!${NC}"
             else
-                 echo -e "${RED}❌ Falha ao conectar. Verifique se o Mestre está rodando e a VPN conectada.${NC}"
+                echo -e "${RED}❌ Falha ao conectar. Verifique se o Mestre está rodando e a VPN conectada.${NC}"
             fi
+        else
+            echo -e "${RED}❌ Comando inválido. Operação cancelada.${NC}"
+            exit 1
+        fi
         else
             echo -e "${GREEN}✅ Este nó já faz parte do Swarm.${NC}"
         fi
