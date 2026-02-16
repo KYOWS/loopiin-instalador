@@ -123,10 +123,14 @@ EOL
         sudo ufw allow ${WG_PORT}/udp comment "WireGuard"
         sudo ufw allow 22/tcp comment "SSH Publico (Reforçado por Fail2Ban)"
         
-        # Se for o nó 1, libera portas Web
+        # Se for o nó 1 (EDGE NODE), libera portas Web públicas
         if [ "$node_num" == "1" ]; then
-            sudo ufw allow 80/tcp comment "HTTP Traefik"
-            sudo ufw allow 443/tcp comment "HTTPS Traefik"
+            echo -e "${BLUE}🌐 Este é o nó EDGE. Liberando portas HTTP/HTTPS públicas...${NC}"
+            sudo ufw allow 80/tcp comment "HTTP Traefik (Public)"
+            sudo ufw allow 443/tcp comment "HTTPS Traefik (Public)"
+            echo -e "${GREEN}✅ Portas web públicas liberadas (80/443).${NC}"
+        else
+            echo -e "${BLUE}ℹ️  Este não é o nó EDGE. Portas web públicas não serão abertas.${NC}"
         fi
 
         # Libera tráfego interno do Swarm APENAS pela interface da VPN
