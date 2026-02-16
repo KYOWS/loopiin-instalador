@@ -184,7 +184,7 @@ setup_security() {
     echo -e "${BLUE}👮 Configurando Fail2Ban...${NC}"
     cat <<EOF | sudo tee /etc/fail2ban/jail.local > /dev/null
 [DEFAULT]
-ignoreip = 127.0.0.1/8 ::1 ${WG_NET_PREFIX}.0/24
+ignoreip = 127.0.0.1/8 ::1 ${WG_NET}.0/24
 bantime  = 1h
 findtime = 10m
 maxretry = 5
