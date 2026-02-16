@@ -462,7 +462,7 @@ install_docker_function() {
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
     # Adicionar usuário atual ao grupo docker
     sudo usermod -aG docker $USER && \
-    #newgrp docker && \
+    newgrp docker && \
     # Iniciar e habilitar Docker
     sudo systemctl start docker && \
     sudo systemctl enable docker
