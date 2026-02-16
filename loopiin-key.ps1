@@ -5,9 +5,9 @@ $Green = "Green"
 $Red = "Red"
 $White = "White"
 
-Write-Host "==============================================" -ForegroundColor $Cyan
-Write-Host "   GERADOR DE ACESSO SSH (WINDOWS) v2.0       " -ForegroundColor $Cyan
-Write-Host "==============================================" -ForegroundColor $Cyan
+Write-Host "==========================================" -ForegroundColor $Cyan
+Write-Host "   GERADOR DE ACESSO SSH (WINDOWS)        " -ForegroundColor $Cyan
+Write-Host "==========================================" -ForegroundColor $Cyan
 Write-Host ""
 
 # 1. Coleta de Dados
@@ -16,9 +16,9 @@ Write-Host "Responda as perguntas abaixo:" -ForegroundColor $Yellow
 $KeyName = Read-Host "1. Nome do arquivo da chave (ex: id_hostinger)"
 if ([string]::IsNullOrWhiteSpace($KeyName)) { Write-Host "Erro: Nome inválido!" -ForegroundColor $Red; exit }
 
-$KeyComment = Read-Host "2. Seu Email ou Comentário (ex: luiz@dev)"
-$HostAlias = Read-Host "3. Apelido do Servidor (ex: myserver)"
-$HostIP = Read-Host "4. IP do Servidor (ex: 111.111.111.11)"
+$KeyComment = Read-Host "2. Seu Email ou Comentário (ex: email@email)"
+$HostAlias = Read-Host "3. Apelido do Servidor (ex: kvm4)"
+$HostIP = Read-Host "4. IP do Servidor (ex: xxx.xxx.xxx.xx)"
 $HostUser = Read-Host "5. Usuário Remoto (ex: root)"
 
 $UserHome = $env:USERPROFILE
