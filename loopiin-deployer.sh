@@ -206,54 +206,65 @@ setup_nfs_storage() {
     show_animated_logo
     echo -e "${BLUE}📁 Configurando Storage Compartilhado (NFS)...${NC}"
 
-    # Criar o grupo 'app' com ID 1011 para padronizar permissões no cluster
+    # Criar o grupo 'app' com ID 1011
     sudo groupadd -g 1011 app 2>/dev/null || true
     sudo usermod -aG app $USER 2>/dev/null || true
 
     if [ "$node_num" == "1" ]; then
         echo -e "${YELLOW}🖥️ Configurando este servidor como MESTRE do Storage...${NC}"
         
-        # 1. Instalar Servidor NFS
+        # 1. Instalar Servidor
         (sudo apt-get install -y nfs-kernel-server) > /dev/null 2>&1 & spinner $!
         wait $!
 
-        # 2. Criar diretórios
-        sudo mkdir -p /srv/nfs/swarm_data
-        sudo chown -R root:app /srv/nfs/swarm_data
-        sudo chmod -R 770 /srv/nfs/swarm_data
-
-        # 3. Configurar Exportação (Apenas para a rede da VPN)
-        # rw: leitura/escrita | sync: confirma escrita | all_squash: força o UID 1011
-        local export_line="/srv/nfs/swarm_data ${WG_NET}.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1011,anongid=1011,fsid=0)"
+        # 2. Criar diretórios (USANDO A VARIÁVEL AQUI)
+        # Substituímos '/srv/nfs/swarm_data' por '$NFS_SERVER_PATH'
+        sudo mkdir -p $NFS_SERVER_PATH
         
-        if ! grep -q "/srv/nfs/swarm_data" /etc/exports; then
+        # Ajuste: Criar subpasta do Portainer já com permissão
+        sudo mkdir -p $NFS_SERVER_PATH/portainer_data
+
+        sudo chown -R 1011:1011 $NFS_SERVER_PATH
+        sudo chmod -R 770 $NFS_SERVER_PATH
+
+        # 3. Configurar Exportação
+        local export_line="$NFS_SERVER_PATH ${WG_NET}.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1011,anongid=1011,fsid=0)"
+        
+        if ! grep -q "$NFS_SERVER_PATH" /etc/exports; then
             echo "$export_line" | sudo tee -a /etc/exports > /dev/null
         fi
 
         sudo exportfs -ra
-        echo -e "${GREEN}✅ Servidor NFS pronto e exportado para a rede ${WG_NET}.0/24${NC}"
+        echo -e "${GREEN}✅ Servidor NFS pronto em $NFS_SERVER_PATH${NC}"
+        
+        # 4. Bind Mount Local (Para o Mestre ver igual aos Workers)
+        # Substituímos '/mnt/nfs' por '$NFS_CLIENT_PATH'
+        sudo mkdir -p $NFS_CLIENT_PATH
+        if ! grep -q "$NFS_CLIENT_PATH" /etc/fstab; then
+            echo "$NFS_SERVER_PATH $NFS_CLIENT_PATH none bind 0 0" | sudo tee -a /etc/fstab > /dev/null
+            sudo mount -a 2>/dev/null
+        fi
 
     else
         echo -e "${YELLOW}🔌 Configurando este servidor como CLIENTE do Storage...${NC}"
         
-        # 1. Instalar Cliente NFS
+        # 1. Instalar Cliente
         (sudo apt-get install -y nfs-common) > /dev/null 2>&1 & spinner $!
         wait $!
 
-        # 2. Criar ponto de montagem
-        sudo mkdir -p /mnt/nfs
+        # 2. Criar ponto de montagem (USANDO A VARIÁVEL AQUI)
+        sudo mkdir -p $NFS_CLIENT_PATH
 
-        # 3. Configurar montagem automática no Boot (/etc/fstab)
-        # x-systemd.requires=wg-quick@wg0.service garante que só monta após a VPN subir
-        local mount_line="${WG_NET}.1:/ /mnt/nfs nfs4 rw,vers=4.2,_netdev,noatime,nofail,x-systemd.automount,x-systemd.requires=wg-quick@${WG_INTERFACE}.service 0 0"
+        # 3. Configurar montagem automática
+        local mount_line="${WG_NET}.1:/ $NFS_CLIENT_PATH nfs4 rw,vers=4.2,_netdev,noatime,nofail,x-systemd.automount,x-systemd.requires=wg-quick@${WG_INTERFACE}.service 0 0"
 
-        if ! grep -q "/mnt/nfs" /etc/fstab; then
+        if ! grep -q "$NFS_CLIENT_PATH" /etc/fstab; then
             echo "$mount_line" | sudo tee -a /etc/fstab > /dev/null
         fi
 
         sudo systemctl daemon-reload
         sudo mount -a > /dev/null 2>&1
-        echo -e "${GREEN}✅ Cliente NFS configurado e apontando para ${WG_NET}.1${NC}"
+        echo -e "${GREEN}✅ Cliente NFS configurado em $NFS_CLIENT_PATH${NC}"
     fi
     sleep 2
 }
