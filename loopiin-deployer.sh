@@ -874,6 +874,7 @@ networks:
     name: agent_network
   web:
     external: true
+    name: web
 volumes:
   portainer_data:
 EOL
@@ -1089,14 +1090,14 @@ else
         ########################################################
         echo -e "${YELLOW}👷 Configurando Nó WORKER (Trabalhador)...${NC}"
         
-        if ! sudo docker info | grep -q "Swarm: active"; then
+        if ! sudo docker info --format '{{.Swarm.LocalNodeState}}' | grep -w -q "active"; then
             echo -e "${BLUE}Para conectar este nó ao cluster, vá no terminal do MESTRE e rode:${NC}"
             echo -e "  docker swarm join-token worker"
             echo -e "${YELLOW}📋 Cole aqui o comando de join fornecido pelo nó manager:${NC}"
             read -r -p "> " join_cmd
             
         # Validação de segurança do comando
-        if [[ "$join_cmd" =~ ^docker\ swarm\ join\ --token\ [A-Za-z0-9._-]+\ [0-9.:]+$ ]]; then
+        if [[ "$join_cmd" =~ ^docker\ swarm\ join\ --token\ [A-Za-z0-9._:-]+\ [0-9a-fA-F.:]+:[0-9]+$ ]]; then
             sudo $join_cmd
 
             if [ $? -eq 0 ]; then
