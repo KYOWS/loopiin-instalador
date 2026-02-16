@@ -54,6 +54,8 @@ check_openssl() {
 WG_INTERFACE="wg0"
 WG_PORT=51820
 WG_NET="10.100.0"
+NFS_SERVER_PATH="/srv/nfs/swarm_data"
+NFS_CLIENT_PATH="/mnt/nfs"
 
 #####################################################
 ##### Função para Configurar WireGuard e Nó #########
