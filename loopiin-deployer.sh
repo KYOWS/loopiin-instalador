@@ -1065,9 +1065,9 @@ EOL
     echo -e "${BLUE}➡️ Criado por Wallison Santos${NC}"
 
 else
-        # ========================================================
-        # --- LÓGICA DO WORKER (NÓS 2, 3...) - APENAS JOIN ---
-        # ========================================================
+        ########################################################
+        ##### LÓGICA DO WORKER (NÓS 2, 3...) - APENAS JOIN #####
+        ########################################################
         echo -e "${YELLOW}👷 Configurando Nó WORKER (Trabalhador)...${NC}"
         
         if ! sudo docker info | grep -q "Swarm: active"; then
