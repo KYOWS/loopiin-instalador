@@ -56,7 +56,7 @@ WG_PORT=51820
 WG_NET="10.100.0"
 NFS_SERVER_PATH="/srv/nfs/swarm_data"
 NFS_CLIENT_PATH="/mnt/nfs"
-
+node_num=""
 #####################################################
 ##### Função para Configurar WireGuard e Nó #########
 #####################################################
@@ -998,7 +998,7 @@ EOL
 
     # Pega o IP da VPN (WireGuard) para segurança
     # Como definimos lá em cima que o Mestre é o .1
-    SERVER_IP="10.100.0.1"
+    SERVER_IP="$NODE_IP"
     if [ -z "$SERVER_IP" ]; then
         echo -e "${RED}❌ Não foi possível detectar o endereço IP do servidor.${NC}"
         exit 1
