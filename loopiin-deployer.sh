@@ -173,6 +173,125 @@ EOL
     read -p "Pressione [Enter] para continuar..."
 }
 
+#####################################################
+##### Função para Fail2Ban e SSH Hardening ##########
+#####################################################
+
+setup_security() {
+    echo -e "${BLUE}🛡️ Configurando Segurança de Acesso...${NC}"
+    
+    # 1. Injeção de Chave SSH
+    echo -e "${YELLOW}Deseja configurar sua Chave SSH agora e bloquear login por senha?${NC}"
+    echo -e "1) Sim (Recomendado - Mais Seguro)"
+    echo -e "2) Não (Manter login por senha - Menos Seguro)"
+    read -p "Opção: " ssh_opt
+
+    if [ "$ssh_opt" == "1" ]; then
+        echo -e "${BLUE}Cole sua Chave Pública (ssh-ed25519... ou ssh-rsa...) abaixo e dê ENTER:${NC}"
+        read -r USER_PUB_KEY
+        
+        if [[ "$USER_PUB_KEY" == ssh-* ]]; then
+            mkdir -p ~/.ssh
+            chmod 700 ~/.ssh
+            touch ~/.ssh/authorized_keys
+            chmod 600 ~/.ssh/authorized_keys
+            
+            if ! grep -q "$USER_PUB_KEY" ~/.ssh/authorized_keys; then
+                echo "$USER_PUB_KEY" >> ~/.ssh/authorized_keys
+                echo -e "${GREEN}✅ Chave SSH adicionada com sucesso!${NC}"
+            else
+                echo -e "${YELLOW}ℹ️ Chave já existente.${NC}"
+            fi
+
+            # Bloqueia senha
+            echo -e "${YELLOW}🔒 Bloqueando login por senha...${NC}"
+            echo -e "PermitRootLogin prohibit-password\nPasswordAuthentication no" | sudo tee /etc/ssh/sshd_config.d/01_hardening.conf > /dev/null
+        else
+            echo -e "${RED}❌ Chave inválida! Mantendo login por senha para segurança.${NC}"
+            echo -e "PermitRootLogin yes" | sudo tee /etc/ssh/sshd_config.d/01_hardening.conf > /dev/null
+        fi
+    else
+        echo -e "${YELLOW}⚠️ Mantendo login por senha ativo.${NC}"
+        echo -e "PermitRootLogin yes" | sudo tee /etc/ssh/sshd_config.d/01_hardening.conf > /dev/null
+    fi
+
+    # 2. Fail2Ban
+    echo -e "${BLUE}👮 Configurando Fail2Ban...${NC}"
+    cat <<EOF | sudo tee /etc/fail2ban/jail.local > /dev/null
+[DEFAULT]
+ignoreip = 127.0.0.1/8 ::1 ${WG_NET_PREFIX}.0/24
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+[sshd]
+enabled = true
+port    = ssh
+bantime.increment = true
+EOF
+
+    sudo systemctl restart fail2ban
+    sudo systemctl restart ssh
+}
+
+#####################################################
+##### Função para Setup de Storage (NFS) ############
+#####################################################
+setup_nfs_storage() {
+    show_animated_logo
+    echo -e "${BLUE}📁 Configurando Storage Compartilhado (NFS)...${NC}"
+
+    # Criar o grupo 'app' com ID 1011 para padronizar permissões no cluster
+    sudo groupadd -g 1011 app 2>/dev/null || true
+    sudo usermod -aG app $USER 2>/dev/null || true
+
+    if [ "$node_num" == "1" ]; then
+        echo -e "${YELLOW}🖥️ Configurando este servidor como MESTRE do Storage...${NC}"
+        
+        # 1. Instalar Servidor NFS
+        (sudo apt-get install -y nfs-kernel-server) > /dev/null 2>&1 & spinner $!
+        wait $!
+
+        # 2. Criar diretórios
+        sudo mkdir -p /srv/nfs/swarm_data
+        sudo chown -R root:app /srv/nfs/swarm_data
+        sudo chmod -R 770 /srv/nfs/swarm_data
+
+        # 3. Configurar Exportação (Apenas para a rede da VPN)
+        # rw: leitura/escrita | sync: confirma escrita | all_squash: força o UID 1011
+        local export_line="/srv/nfs/swarm_data ${WG_NET}.0/24(rw,sync,no_subtree_check,all_squash,anonuid=1011,anongid=1011,fsid=0)"
+        
+        if ! grep -q "/srv/nfs/swarm_data" /etc/exports; then
+            echo "$export_line" | sudo tee -a /etc/exports > /dev/null
+        fi
+
+        sudo exportfs -ra
+        echo -e "${GREEN}✅ Servidor NFS pronto e exportado para a rede ${WG_NET}.0/24${NC}"
+
+    else
+        echo -e "${YELLOW}🔌 Configurando este servidor como CLIENTE do Storage...${NC}"
+        
+        # 1. Instalar Cliente NFS
+        (sudo apt-get install -y nfs-common) > /dev/null 2>&1 & spinner $!
+        wait $!
+
+        # 2. Criar ponto de montagem
+        sudo mkdir -p /mnt/nfs
+
+        # 3. Configurar montagem automática no Boot (/etc/fstab)
+        # x-systemd.requires=wg-quick@wg0.service garante que só monta após a VPN subir
+        local mount_line="${WG_NET}.1:/ /mnt/nfs nfs4 rw,vers=4.2,_netdev,noatime,nofail,x-systemd.automount,x-systemd.requires=wg-quick@${WG_INTERFACE}.service 0 0"
+
+        if ! grep -q "/mnt/nfs" /etc/fstab; then
+            echo "$mount_line" | sudo tee -a /etc/fstab > /dev/null
+        fi
+
+        sudo systemctl daemon-reload
+        sudo mount -a > /dev/null 2>&1
+        echo -e "${GREEN}✅ Cliente NFS configurado e apontando para ${WG_NET}.1${NC}"
+    fi
+    sleep 2
+}
+
 ###############################################################
 ##### Função para gerar certificados TLS para o Portainer #####
 ###############################################################
