@@ -56,6 +56,22 @@ if (-not (Test-Path -Path $ConfigFile)) {
 }
 
 $ConfigContent = Get-Content $ConfigFile -Raw -ErrorAction SilentlyContinue
+
+# --- [NOVO] Configurações Globais (Agente e Compatibilidade) ---
+# Verifica se já existe a config global para não duplicar
+if ($ConfigContent -notmatch "IgnoreUnknown AddKeysToAgent") {
+    Write-Host "⚙️ Adicionando configurações globais de compatibilidade..." -ForegroundColor $Yellow
+    $GlobalBlock = @"
+Host *
+    IgnoreUnknown AddKeysToAgent,UseKeychain
+    AddKeysToAgent yes
+    # UseKeychain yes <-- somente habilitar se usar o Mac
+"@
+    # Adiciona no início ou fim. Aqui adicionamos antes do bloco novo.
+    Add-Content -Path $ConfigFile -Value $GlobalBlock
+}
+
+# --- Configuração do Servidor Específico ---
 if ($ConfigContent -match "Host $HostAlias") {
     Write-Host "⚠️  Já existe configuração para '$HostAlias'." -ForegroundColor $Red
 } else {
@@ -66,6 +82,7 @@ if ($ConfigContent -match "Host $HostAlias") {
 Host $HostAlias
     HostName $HostIP
     User $HostUser
+    Port 22
     IdentityFile $KeyPath
     IdentitiesOnly yes
 "@
