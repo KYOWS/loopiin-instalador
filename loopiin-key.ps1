@@ -48,16 +48,23 @@ if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
         dism.exe /Online /Add-Capability /CapabilityName:OpenSSH.Client~~~~0.0.1.0
     }
 
-    # Validação pós-instalação
-    Start-Sleep -Seconds 3
+# Validação real do estado
+$cap = Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH.Client*'
 
-    if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
-        Write-Host "❌ OpenSSH não foi instalado corretamente." -ForegroundColor $Red
-        Pause
-        exit
-    }
+if ($cap.State -eq "InstallPending") {
+    Write-Host "⚠️ Instalação pendente. Reinicie o Windows para concluir." -ForegroundColor $Yellow
+    Pause
+    exit
+}
 
-    Write-Host "✅ OpenSSH instalado com sucesso!" -ForegroundColor $Green
+if ($cap.State -ne "Installed") {
+    Write-Host "❌ OpenSSH não foi instalado corretamente." -ForegroundColor $Red
+    Pause
+    exit
+}
+
+Write-Host "✅ OpenSSH instalado com sucesso!" -ForegroundColor $Green
+
 }
 
 # --- Coleta de Dados ---
