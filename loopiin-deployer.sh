@@ -115,6 +115,29 @@ ListenPort = ${WG_PORT}
 PrivateKey = ${priv_key}
 
 # Peears devem ser adicionados manualmente após a instalação em todos os nós
+
+# --- PEERS (INFORMAÇOES)---
+# VPS2 -> 10.100.0.2 (Public IP: xxx.xxx.xxx.xxx)
+# VPS3 -> 10.100.0.3 (Public IP: xxx.xxx.xxx.xxx)
+# VPS4 -> 10.100.0.4 (Public IP: xxx.xxx.xxx.xxx)
+
+# [Peer] # VPS2
+# PublicKey = <CHAVE_PUBLICA_DO_OUTRO_VPS>
+# AllowedIPs = <IP_INTERNO_DO_OUTRO_VPS>/32
+# Endpoint = <IP_PUBLICO_DO_OUTRO_VPS>:51820
+# PersistentKeepalive = 25
+
+# [Peer] # VPS3
+# PublicKey = <CHAVE_PUBLICA_DO_OUTRO_VPS>
+# AllowedIPs = <IP_INTERNO_DO_OUTRO_VPS>/32
+# Endpoint = <IP_PUBLICO_DO_OUTRO_VPS>:51820
+# PersistentKeepalive = 25
+
+# [Peer] # VPS4
+# PublicKey = <CHAVE_PUBLICA_DO_OUTRO_VPS>
+# AllowedIPs = <IP_INTERNO_DO_OUTRO_VPS>/32
+# Endpoint = <IP_PUBLICO_DO_OUTRO_VPS>:51820
+# PersistentKeepalive = 25
 EOL
 
     # 5. Ajustar Firewall UFW para WireGuard e SSH (Lógica de IP Dinâmico)
@@ -171,10 +194,10 @@ EOL
         echo -e "${YELLOW}⚠️  Aviso: Não foi possível pingar o próprio IP da VPN.${NC}"
     fi
     
-    echo -e "${BLUE}📝 IMPORTANTE: Após configurar todos os nós, teste a conectividade:${NC}"
+    echo -e "${BLUE}📝 IMPORTANTE: Após configurar todos os nós, teste a conectividade EX:${NC}"
     echo -e "${YELLOW}   ping 10.100.0.2  # (do nó 8 para o nó 2)${NC}"
-    echo -e "${YELLOW}   ping 10.100.0.4  # (do nó 8 para o nó 4)${NC}"
-    echo -e "${YELLOW}   ping 10.100.0.8  # (do nó 2/4 para o nó 8)${NC}"
+    echo -e "${YELLOW}   ping 10.100.0.3  # (do nó 8 para o nó 4)${NC}"
+    echo -e "${YELLOW}   ping 10.100.0.4  # (do nó 2/4 para o nó 8)${NC}"
     
     (sudo ufw status | head -n 1 && sudo ufw status | grep -E '80|22|443|2377|7946|4789|51820') || sudo ufw status
     return 0    
