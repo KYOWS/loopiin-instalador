@@ -76,14 +76,25 @@ if ([string]::IsNullOrWhiteSpace($KeyName)) {
     Write-Host "Erro: Nome inválido!" -ForegroundColor $Red
     exit
 }
-
-$KeyComment = Read-Host "2. Seu Email ou Comentário"
-$HostAlias = Read-Host "3. Apelido do Servidor"
-$HostIP = Read-Host "4. IP do Servidor"
-$HostUser = Read-Host "5. Usuário Remoto"
+$KeyComment = Read-Host "2. Seu Email ou Comentário (ex: email@email)"
+$HostAlias = Read-Host "3. Apelido do Servidor (ex: kmv)"
+if ([string]::IsNullOrWhiteSpace($HostAlias)) {
+    Write-Host "Erro: Apelido inválido!" -ForegroundColor $Red
+    exit
+}
+$HostIP = Read-Host "4. IP do Servidor (ex: xxx.xxx.xxx.xx)"
+if (-not ([System.Net.IPAddress]::TryParse($HostIP, [ref]$null))) {
+    Write-Host "❌ IP inválido!" -ForegroundColor $Red
+    exit
+}
+$HostUser = Read-Host "5. Usuário Remoto (ex: root)"
+if ([string]::IsNullOrWhiteSpace($HostUser)) {
+    Write-Host "Erro: Usuário inválido!" -ForegroundColor $Red
+    exit
+}
 
 # --- Escolha de senha para a chave ---
-Write-Host ""
+
 $UsePassphrase = Read-Host "6. Deseja proteger a chave com senha? (s/n)"
 
 $Passphrase = ""
