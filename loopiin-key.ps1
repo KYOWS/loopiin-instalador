@@ -10,13 +10,27 @@ Write-Host "   GERADOR DE ACESSO SSH (WINDOWS)        " -ForegroundColor $Cyan
 Write-Host "==========================================" -ForegroundColor $Cyan
 Write-Host ""
 
+# --- [AUTO-INSTALL] Verifica e Instala OpenSSH Client ---
 if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
-    Write-Host "❌ ERRO: O comando 'ssh-keygen' não foi encontrado." -ForegroundColor $Red
-    Write-Host "Para corrigir, execute este comando como ADMINISTRADOR no PowerShell:" -ForegroundColor $Yellow
-    Write-Host "Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0" -ForegroundColor $White
-    Write-Host ""
-    Pause
-    exit
+    Write-Host "🔍 OpenSSH não detectado. Tentando instalar automaticamente..." -ForegroundColor $Yellow
+    
+    # Verifica se tem privilégios de Administrador
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-Host "❌ ERRO: Para instalar o OpenSSH, execute este script como ADMINISTRADOR." -ForegroundColor $Red
+        Pause
+        exit
+    }
+
+    try {
+        Write-Host "⏳ Instalando OpenSSH Client... (isso pode levar um minuto)" -ForegroundColor $Cyan
+        Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0 -ErrorAction Stop
+        Write-Host "✅ OpenSSH instalado com sucesso!" -ForegroundColor $Green
+    } catch {
+        Write-Host "❌ Falha na instalação automática: $($_.Exception.Message)" -ForegroundColor $Red
+        Pause
+        exit
+    }
 }
 
 # 1. Coleta de Dados
