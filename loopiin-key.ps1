@@ -10,6 +10,15 @@ Write-Host "   GERADOR DE ACESSO SSH (WINDOWS)        " -ForegroundColor $Cyan
 Write-Host "==========================================" -ForegroundColor $Cyan
 Write-Host ""
 
+if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
+    Write-Host "❌ ERRO: O comando 'ssh-keygen' não foi encontrado." -ForegroundColor $Red
+    Write-Host "Para corrigir, execute este comando como ADMINISTRADOR no PowerShell:" -ForegroundColor $Yellow
+    Write-Host "Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0" -ForegroundColor $White
+    Write-Host ""
+    Pause
+    exit
+}
+
 # 1. Coleta de Dados
 Write-Host "Responda as perguntas abaixo:" -ForegroundColor $Yellow
 
@@ -33,21 +42,25 @@ if (-not (Test-Path -Path $SshDir)) {
 }
 
 # 3. Gera a Chave SSH
-if (Test-Path -Path $KeyPath) {
-    Write-Host "⚠️  A chave '$KeyName' já existe!" -ForegroundColor $Red
-    $Overwrite = Read-Host "Deseja sobrescrever? (s/n)"
-    if ($Overwrite -eq 's') {
-        Remove-Item "$KeyPath"
-        Remove-Item "$KeyPath.pub"
-        # Gera chave nova
-        ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
-        Write-Host "✅ Nova chave gerada." -ForegroundColor $Green
+try {
+    if (Test-Path -Path $KeyPath) {
+        Write-Host "⚠️  A chave '$KeyName' já existe!" -ForegroundColor $Red
+        $Overwrite = Read-Host "Deseja sobrescrever? (s/n)"
+        if ($Overwrite -eq 's') {
+            Remove-Item "$KeyPath" -Force -ErrorAction SilentlyContinue
+            Remove-Item "$KeyPath.pub" -Force -ErrorAction SilentlyContinue
+            ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
+            Write-Host "✅ Nova chave gerada." -ForegroundColor $Green
+        } else {
+            Write-Host "Mantendo a chave existente." -ForegroundColor $Yellow
+        }
     } else {
-        Write-Host "Mantendo a chave existente." -ForegroundColor $Yellow
+        ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
+        Write-Host "✅ Chave criada com sucesso." -ForegroundColor $Green
     }
-} else {
-    ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
-    Write-Host "✅ Chave criada com sucesso." -ForegroundColor $Green
+} catch {
+    Write-Host "❌ Falha crítica ao gerar a chave!" -ForegroundColor $Red
+    exit
 }
 
 # 4. Configura o arquivo config
