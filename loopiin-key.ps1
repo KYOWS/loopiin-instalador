@@ -12,22 +12,28 @@ Write-Host ""
 
 # --- [AUTO-INSTALL] Verifica e Instala OpenSSH Client ---
 if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
-    Write-Host "🔍 OpenSSH não detectado. Tentando instalar automaticamente..." -ForegroundColor $Yellow
+    Write-Host "🔍 OpenSSH não detectado. Tentando instalar..." -ForegroundColor $Yellow
     
-    # Verifica se tem privilégios de Administrador
-    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
-    if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        Write-Host "❌ ERRO: Para instalar o OpenSSH, execute este script como ADMINISTRADOR." -ForegroundColor $Red
+    # Nova checagem de privilégios mais precisa
+    $Identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $Principal = New-Object Security.Principal.WindowsPrincipal($Identity)
+    $IsAdmin = $Principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    if (-not $IsAdmin) {
+        Write-Host "❌ ERRO DE PERMISSÃO" -ForegroundColor $Red
+        Write-Host "O script detectou que você é: $($Identity.Name)" -ForegroundColor $White
+        Write-Host "Por favor: Feche tudo, clique com o BOTÃO DIREITO no ícone do PowerShell e escolha 'Executar como Administrador'." -ForegroundColor $Yellow
         Pause
         exit
     }
 
     try {
-        Write-Host "⏳ Instalando OpenSSH Client... (isso pode levar um minuto)" -ForegroundColor $Cyan
-        Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0 -ErrorAction Stop
-        Write-Host "✅ OpenSSH instalado com sucesso!" -ForegroundColor $Green
+        Write-Host "⏳ Instalando OpenSSH... Aguarde." -ForegroundColor $Cyan
+        # Forçando o uso do DISM caso o Add-WindowsCapability falhe por política de grupo
+        dism.exe /Online /Add-Capability /CapabilityName:OpenSSH.Client~~~~0.0.1.0
+        Write-Host "✅ Instalação concluída!" -ForegroundColor $Green
     } catch {
-        Write-Host "❌ Falha na instalação automática: $($_.Exception.Message)" -ForegroundColor $Red
+        Write-Host "❌ Falha na instalação: $($_.Exception.Message)" -ForegroundColor $Red
         Pause
         exit
     }
