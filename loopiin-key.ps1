@@ -24,7 +24,6 @@ if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
         Write-Host "O script detectou que você é: $($Identity.Name)" -ForegroundColor $White
         Write-Host "Por favor: Feche tudo, clique com o BOTÃO DIREITO no ícone do PowerShell e escolha 'Executar como Administrador'." -ForegroundColor $Yellow
         Pause
-        exit
     }
 
     try {
@@ -35,7 +34,6 @@ if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
     } catch {
         Write-Host "❌ Falha na instalação: $($_.Exception.Message)" -ForegroundColor $Red
         Pause
-        exit
     }
 }
 
@@ -80,7 +78,6 @@ try {
     }
 } catch {
     Write-Host "❌ Falha crítica ao gerar a chave!" -ForegroundColor $Red
-    exit
 }
 
 # 4. Configura o arquivo config
