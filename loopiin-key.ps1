@@ -82,6 +82,35 @@ $HostAlias = Read-Host "3. Apelido do Servidor"
 $HostIP = Read-Host "4. IP do Servidor"
 $HostUser = Read-Host "5. Usuário Remoto"
 
+# --- Escolha de senha para a chave ---
+Write-Host ""
+$UsePassphrase = Read-Host "6. Deseja proteger a chave com senha? (s/n)"
+
+$Passphrase = ""
+
+if ($UsePassphrase -eq "s") {
+    Write-Host "Digite a senha da chave:" -ForegroundColor $Yellow
+    $SecurePass1 = Read-Host -AsSecureString
+    Write-Host "Confirme a senha:" -ForegroundColor $Yellow
+    $SecurePass2 = Read-Host -AsSecureString
+
+    $Plain1 = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePass1)
+    )
+
+    $Plain2 = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
+        [Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePass2)
+    )
+
+    if ($Plain1 -ne $Plain2) {
+        Write-Host "❌ As senhas não coincidem." -ForegroundColor $Red
+        exit
+    }
+
+    $Passphrase = $Plain1
+}
+
+
 $UserHome = $env:USERPROFILE
 $SshDir = "$UserHome\.ssh"
 $KeyPath = "$SshDir\$KeyName"
@@ -102,12 +131,12 @@ try {
             Write-Host "Mantendo chave existente." -ForegroundColor $Yellow
         } else {
             Remove-Item "$KeyPath*" -Force
-            ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
+            ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "$Passphrase" -q
             Write-Host "✅ Nova chave criada." -ForegroundColor $Green
         }
     }
     else {
-        ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
+        ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "$Passphrase" -q
         Write-Host "✅ Chave criada com sucesso." -ForegroundColor $Green
     }
 }
