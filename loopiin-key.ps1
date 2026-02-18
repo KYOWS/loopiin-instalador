@@ -1,3 +1,8 @@
+# ==========================================
+#      GERADOR DE ACESSO SSH (WINDOWS)
+#           Versão Robusta
+# ==========================================
+
 # --- Configurações de Cores ---
 $Cyan = "Cyan"
 $Yellow = "Yellow"
@@ -10,125 +15,149 @@ Write-Host "   GERADOR DE ACESSO SSH (WINDOWS)        " -ForegroundColor $Cyan
 Write-Host "==========================================" -ForegroundColor $Cyan
 Write-Host ""
 
-# --- [AUTO-INSTALL] Verifica e Instala OpenSSH Client ---
-if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
-    Write-Host "🔍 OpenSSH não detectado. Tentando instalar..." -ForegroundColor $Yellow
-    
-    # Nova checagem de privilégios mais precisa
+# --- FUNÇÃO: Verifica se é Admin ---
+function Test-IsAdmin {
     $Identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $Principal = New-Object Security.Principal.WindowsPrincipal($Identity)
-    $IsAdmin = $Principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    return $Principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
 
-    if (-not $IsAdmin) {
-        Write-Host "❌ ERRO DE PERMISSÃO" -ForegroundColor $Red
-        Write-Host "O script detectou que você é: $($Identity.Name)" -ForegroundColor $White
-        Write-Host "Por favor: Feche tudo, clique com o BOTÃO DIREITO no ícone do PowerShell e escolha 'Executar como Administrador'." -ForegroundColor $Yellow
+# --- FUNÇÃO: Verifica se OpenSSH está instalado ---
+function Test-OpenSSHInstalled {
+    $capability = Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH.Client*'
+    return ($capability.State -eq "Installed")
+}
+
+# --- INSTALAÇÃO AUTOMÁTICA ---
+if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
+
+    Write-Host "🔍 OpenSSH não detectado." -ForegroundColor $Yellow
+
+    if (-not (Test-IsAdmin)) {
+        Write-Host "❌ Execute o PowerShell como ADMINISTRADOR." -ForegroundColor $Red
         Pause
+        exit
     }
 
     try {
-        Write-Host "⏳ Instalando OpenSSH... Aguarde." -ForegroundColor $Cyan
-        # Forçando o uso do DISM caso o Add-WindowsCapability falhe por política de grupo
-        dism.exe /Online /Add-Capability /CapabilityName:OpenSSH.Client~~~~0.0.1.0
-        Write-Host "✅ Instalação concluída!" -ForegroundColor $Green
-    } catch {
-        Write-Host "❌ Falha na instalação: $($_.Exception.Message)" -ForegroundColor $Red
-        Pause
+        Write-Host "⏳ Tentando instalar via Add-WindowsCapability..." -ForegroundColor $Cyan
+        Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0 -ErrorAction Stop
     }
+    catch {
+        Write-Host "⚠️ Falha no método padrão. Tentando via DISM..." -ForegroundColor $Yellow
+        dism.exe /Online /Add-Capability /CapabilityName:OpenSSH.Client~~~~0.0.1.0
+    }
+
+    # Validação pós-instalação
+    Start-Sleep -Seconds 3
+
+    if (-not (Get-Command "ssh-keygen" -ErrorAction SilentlyContinue)) {
+        Write-Host "❌ OpenSSH não foi instalado corretamente." -ForegroundColor $Red
+        Pause
+        exit
+    }
+
+    Write-Host "✅ OpenSSH instalado com sucesso!" -ForegroundColor $Green
 }
 
-# 1. Coleta de Dados
+# --- Coleta de Dados ---
+Write-Host ""
 Write-Host "Responda as perguntas abaixo:" -ForegroundColor $Yellow
 
 $KeyName = Read-Host "1. Nome do arquivo da chave (ex: id_hostinger)"
-if ([string]::IsNullOrWhiteSpace($KeyName)) { Write-Host "Erro: Nome inválido!" -ForegroundColor $Red; exit }
+if ([string]::IsNullOrWhiteSpace($KeyName)) {
+    Write-Host "Erro: Nome inválido!" -ForegroundColor $Red
+    exit
+}
 
-$KeyComment = Read-Host "2. Seu Email ou Comentário (ex: email@email)"
-$HostAlias = Read-Host "3. Apelido do Servidor (ex: kvm4)"
-$HostIP = Read-Host "4. IP do Servidor (ex: xxx.xxx.xxx.xx)"
-$HostUser = Read-Host "5. Usuário Remoto (ex: root)"
+$KeyComment = Read-Host "2. Seu Email ou Comentário"
+$HostAlias = Read-Host "3. Apelido do Servidor"
+$HostIP = Read-Host "4. IP do Servidor"
+$HostUser = Read-Host "5. Usuário Remoto"
 
 $UserHome = $env:USERPROFILE
 $SshDir = "$UserHome\.ssh"
 $KeyPath = "$SshDir\$KeyName"
 $ConfigFile = "$SshDir\config"
 
-# 2. Verifica/Cria pasta .ssh
-if (-not (Test-Path -Path $SshDir)) {
-    New-Item -ItemType Directory -Force -Path $SshDir | Out-Null
-    Write-Host "Pasta .ssh criada." -ForegroundColor $Green
+# --- Cria pasta .ssh se necessário ---
+if (-not (Test-Path $SshDir)) {
+    New-Item -ItemType Directory -Path $SshDir | Out-Null
+    Write-Host "📁 Pasta .ssh criada." -ForegroundColor $Green
 }
 
-# 3. Gera a Chave SSH
+# --- Geração de Chave ---
 try {
-    if (Test-Path -Path $KeyPath) {
-        Write-Host "⚠️  A chave '$KeyName' já existe!" -ForegroundColor $Red
-        $Overwrite = Read-Host "Deseja sobrescrever? (s/n)"
-        if ($Overwrite -eq 's') {
-            Remove-Item "$KeyPath" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$KeyPath.pub" -Force -ErrorAction SilentlyContinue
-            ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
-            Write-Host "✅ Nova chave gerada." -ForegroundColor $Green
+    if (Test-Path $KeyPath) {
+        Write-Host "⚠️ A chave já existe!" -ForegroundColor $Yellow
+        $Overwrite = Read-Host "Sobrescrever? (s/n)"
+        if ($Overwrite -ne "s") {
+            Write-Host "Mantendo chave existente." -ForegroundColor $Yellow
         } else {
-            Write-Host "Mantendo a chave existente." -ForegroundColor $Yellow
+            Remove-Item "$KeyPath*" -Force
+            ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
+            Write-Host "✅ Nova chave criada." -ForegroundColor $Green
         }
-    } else {
+    }
+    else {
         ssh-keygen -t ed25519 -f "$KeyPath" -C "$KeyComment" -N "" -q
         Write-Host "✅ Chave criada com sucesso." -ForegroundColor $Green
     }
-} catch {
-    Write-Host "❌ Falha crítica ao gerar a chave!" -ForegroundColor $Red
+}
+catch {
+    Write-Host "❌ Erro ao gerar chave: $($_.Exception.Message)" -ForegroundColor $Red
+    exit
 }
 
-# 4. Configura o arquivo config
-if (-not (Test-Path -Path $ConfigFile)) {
-    New-Item -ItemType File -Force -Path $ConfigFile | Out-Null
+# --- Configuração SSH config ---
+if (-not (Test-Path $ConfigFile)) {
+    New-Item -ItemType File -Path $ConfigFile | Out-Null
 }
 
 $ConfigContent = Get-Content $ConfigFile -Raw -ErrorAction SilentlyContinue
 
-# --- [NOVO] Configurações Globais (Agente e Compatibilidade) ---
-# Verifica se já existe a config global para não duplicar
+# Bloco global (evita duplicação)
 if ($ConfigContent -notmatch "IgnoreUnknown AddKeysToAgent") {
-    Write-Host "⚙️ Adicionando configurações globais de compatibilidade..." -ForegroundColor $Yellow
-    $GlobalBlock = @"
+
+@"
 Host *
     IgnoreUnknown AddKeysToAgent,UseKeychain
     AddKeysToAgent yes
-    # UseKeychain yes <-- somente habilitar se usar o Mac
-"@
-    # Adiciona no início ou fim. Aqui adicionamos antes do bloco novo.
-    Add-Content -Path $ConfigFile -Value $GlobalBlock
+"@ | Add-Content $ConfigFile
+
+    Write-Host "⚙️ Configuração global adicionada." -ForegroundColor $Green
 }
 
-# --- Configuração do Servidor Específico ---
+# Bloco específico
 if ($ConfigContent -match "Host $HostAlias") {
-    Write-Host "⚠️  Já existe configuração para '$HostAlias'." -ForegroundColor $Red
-} else {
-    Write-Host "📝 Atualizando arquivo config..." -ForegroundColor $Yellow
-    $NewBlock = @"
+    Write-Host "⚠️ Host já existe no config." -ForegroundColor $Yellow
+}
+else {
 
-# --- Gerado automaticamente para $KeyComment ---
+@"
+
+# --- Gerado automaticamente ---
 Host $HostAlias
     HostName $HostIP
     User $HostUser
     Port 22
     IdentityFile $KeyPath
     IdentitiesOnly yes
-"@
-    Add-Content -Path $ConfigFile -Value $NewBlock
-    Write-Host "✅ Configuração salva!" -ForegroundColor $Green
+"@ | Add-Content $ConfigFile
+
+    Write-Host "✅ Configuração adicionada ao config." -ForegroundColor $Green
 }
 
-# 5. Exibe a chave pública
+# --- Finalização ---
 Write-Host ""
 Write-Host "==============================================" -ForegroundColor $Cyan
 Write-Host "🎉 TUDO PRONTO!" -ForegroundColor $Green
-Write-Host "Para conectar, abra o PowerShell e digite: ssh $HostAlias" -ForegroundColor $Yellow
+Write-Host "Use: ssh $HostAlias" -ForegroundColor $Yellow
 Write-Host ""
-Write-Host "Copie a linha abaixo para colar na VPS:" -ForegroundColor $White
+Write-Host "Chave pública para colar na VPS:" -ForegroundColor $White
 Write-Host "---------------------------------------------------" -ForegroundColor $Cyan
 Get-Content "$KeyPath.pub"
 Write-Host "---------------------------------------------------" -ForegroundColor $Cyan
 Write-Host ""
+
 Pause
