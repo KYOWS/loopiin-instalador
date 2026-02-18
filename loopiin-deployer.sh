@@ -1159,6 +1159,13 @@ else
         
         echo -e "\n${GREEN}🎉 Configuração do Worker finalizada!${NC}"
         echo -e "${YELLOW}Agora você pode adicionar este nó no arquivo /etc/wireguard/wg0.conf dos outros servidores.${NC}"
+        echo -e "${GREEN}================================${NC}"
+        echo -e "🔑 WireGuard Public Key (Copie para os Peers):"
+           echo -e "${YELLOW}$WG_PUB${NC}"
+        echo -e "${GREEN}================================${NC}"
+        echo ""
+        echo -e "${GREEN}🌟 Visite: https://loopiin.com.br${NC}"
+        echo -e "${BLUE}➡️ Criado por Wallison Santos${NC}"
     fi
 
 else
