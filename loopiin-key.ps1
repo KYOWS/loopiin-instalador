@@ -161,7 +161,10 @@ if (-not (Test-Path $ConfigFile)) {
     New-Item -ItemType File -Path $ConfigFile | Out-Null
 }
 
-$ConfigContent = Get-Content $ConfigFile -Raw -ErrorAction SilentlyContinue
+$ConfigContent = ""
+if (Test-Path $ConfigFile) {
+    $ConfigContent = Get-Content $ConfigFile -Raw -ErrorAction SilentlyContinue
+}
 
 # Bloco global (evita duplicação)
 if ($ConfigContent -notmatch "IgnoreUnknown AddKeysToAgent") {
